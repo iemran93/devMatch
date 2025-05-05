@@ -20,6 +20,7 @@ type Env struct {
 	RefreshTokenSecret     string `mapstructure:"REFRESH_TOKEN_SECRET"`
 	GoogleClientID         string `mapstructure:"GOOGLE_CLIENT_ID"`
 	GoogleClientSecret     string `mapstructure:"GOOGLE_CLIENT_SECRET"`
+	MigrationPath          string `mapstructure:"MIGRATION_PATH"`
 }
 
 func NewEnv() *Env {

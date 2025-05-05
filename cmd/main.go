@@ -21,7 +21,7 @@ func main() {
 	db := app.MySql
 	defer app.CloseDBConnection()
 
-	utils.MigrateDB(db)
+	utils.MigrateDB(db, env)
 
 	timeout := time.Duration(env.ContextTimeout) * time.Second
 

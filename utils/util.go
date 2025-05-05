@@ -5,6 +5,14 @@ import (
 	"net/http"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
+
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func JSON(w http.ResponseWriter, code int, obj interface{}) {
@@ -14,20 +22,18 @@ func JSON(w http.ResponseWriter, code int, obj interface{}) {
 	enc.Encode(obj)
 }
 
-func MigrateDB(db *sqlx.DB) {
-	db.MustExec(`
-		CREATE TABLE IF NOT EXISTS users (
-		id SERIAL PRIMARY KEY,
-		google_id VARCHAR(255) DEFAULT '',
-		profile_picture VARCHAR(255) DEFAULT '',
-		name VARCHAR(255) DEFAULT '',
-		password VARCHAR(255) DEFAULT '',
-		email VARCHAR(255) NOT NULL UNIQUE,
-		phone VARCHAR(255) DEFAULT '',
-		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-		updated_at TIMESTAMP 
-		);
-	`)
+func MigrateDB(db *sqlx.DB, env *bootstrap.Env) {
+	m, err := migrate.New(
+		"file://"+env.MigrationPath, "mysql://"+env.DBUser+":"+env.DBPass+"@tcp("+env.DBHost+":"+env.DBPort+")/"+env.DBName)
+	if err != nil {
+		log.Error("error while creating migration instance: ", err)
+		return
+	}
+	err = m.Steps(1)
+	if err != nil || err != migrate.ErrNoChange {
+		log.Error("error while migrating database: ", err)
+		return
+	}
 }
 
 func SetCookie(w http.ResponseWriter, name string, value string) {

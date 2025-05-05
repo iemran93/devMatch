@@ -1,0 +1,42 @@
+-- Drop all foreign key constraints first to avoid dependency issues
+ALTER TABLE `UserSkill` DROP FOREIGN KEY `UserSkill_user_id_fkey`;
+ALTER TABLE `UserSkill` DROP FOREIGN KEY `UserSkill_category_id_fkey`;
+ALTER TABLE `UserSkill` DROP FOREIGN KEY `UserSkill_technology_id_fkey`;
+ALTER TABLE `UserSkill` DROP FOREIGN KEY `UserSkill_language_id_fkey`;
+ALTER TABLE `Technology` DROP FOREIGN KEY `Technology_category_id_fkey`;
+ALTER TABLE `Project` DROP FOREIGN KEY `Project_category_id_fkey`;
+ALTER TABLE `Project` DROP FOREIGN KEY `Project_project_type_id_fkey`;
+ALTER TABLE `Project` DROP FOREIGN KEY `Project_creator_id_fkey`;
+ALTER TABLE `ProjectTechnology` DROP FOREIGN KEY `ProjectTechnology_project_id_fkey`;
+ALTER TABLE `ProjectTechnology` DROP FOREIGN KEY `ProjectTechnology_technology_id_fkey`;
+ALTER TABLE `ProjectLanguage` DROP FOREIGN KEY `ProjectLanguage_project_id_fkey`;
+ALTER TABLE `ProjectLanguage` DROP FOREIGN KEY `ProjectLanguage_language_id_fkey`;
+ALTER TABLE `ProjectRole` DROP FOREIGN KEY `ProjectRole_project_id_fkey`;
+ALTER TABLE `ProjectMember` DROP FOREIGN KEY `ProjectMember_project_id_fkey`;
+ALTER TABLE `ProjectMember` DROP FOREIGN KEY `ProjectMember_user_id_fkey`;
+ALTER TABLE `ProjectMember` DROP FOREIGN KEY `ProjectMember_role_id_fkey`;
+ALTER TABLE `Chat` DROP FOREIGN KEY `Chat_project_id_fkey`;
+ALTER TABLE `ChatMember` DROP FOREIGN KEY `ChatMember_chat_id_fkey`;
+ALTER TABLE `ChatMember` DROP FOREIGN KEY `ChatMember_user_id_fkey`;
+ALTER TABLE `Message` DROP FOREIGN KEY `Message_chat_id_fkey`;
+ALTER TABLE `Message` DROP FOREIGN KEY `Message_sender_id_fkey`;
+ALTER TABLE `Notification` DROP FOREIGN KEY `Notification_user_id_fkey`;
+ALTER TABLE `Notification` DROP FOREIGN KEY `Notification_actor_id_fkey`;
+ALTER TABLE `Notification` DROP FOREIGN KEY `Notification_project_id_fkey`;
+
+-- Drop all tables in reverse order of creation to avoid dependency issues
+DROP TABLE IF EXISTS `Notification`;
+DROP TABLE IF EXISTS `Message`;
+DROP TABLE IF EXISTS `ChatMember`;
+DROP TABLE IF EXISTS `Chat`;
+DROP TABLE IF EXISTS `ProjectMember`;
+DROP TABLE IF EXISTS `ProjectRole`;
+DROP TABLE IF EXISTS `ProjectLanguage`;
+DROP TABLE IF EXISTS `ProjectTechnology`;
+DROP TABLE IF EXISTS `Project`;
+DROP TABLE IF EXISTS `ProjectType`;
+DROP TABLE IF EXISTS `UserSkill`;
+DROP TABLE IF EXISTS `Language`;
+DROP TABLE IF EXISTS `Technology`;
+DROP TABLE IF EXISTS `Category`;
+DROP TABLE IF EXISTS `User`;
