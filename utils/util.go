@@ -29,8 +29,8 @@ func MigrateDB(db *sqlx.DB, env *bootstrap.Env) {
 		log.Error("error while creating migration instance: ", err)
 		return
 	}
-	err = m.Steps(1)
-	if err != nil || err != migrate.ErrNoChange {
+	err = m.Up()
+	if err != nil && err != migrate.ErrNoChange {
 		log.Error("error while migrating database: ", err)
 		return
 	}
