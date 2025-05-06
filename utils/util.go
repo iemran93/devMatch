@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/iemran93/devMatch/bootstrap"
 	"github.com/jmoiron/sqlx"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"

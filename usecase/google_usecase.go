@@ -10,10 +10,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/internal/tokenutil"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/repository"
+	"github.com/iemran93/devMatch/bootstrap"
+	"github.com/iemran93/devMatch/domain"
+	"github.com/iemran93/devMatch/internal/tokenutil"
+	"github.com/iemran93/devMatch/repository"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"

@@ -4,8 +4,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"testing"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/internal/tokenutil"
+	"github.com/iemran93/devMatch/domain"
+	"github.com/iemran93/devMatch/internal/tokenutil"
 )
 
 func TestCreateAccessToken(t *testing.T) {

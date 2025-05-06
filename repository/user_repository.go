@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
+	"github.com/iemran93/devMatch/domain"
 
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"

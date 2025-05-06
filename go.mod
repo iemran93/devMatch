@@ -1,4 +1,4 @@
-module github.com/oguzhantasimaz/Go-Clean-Architecture-Template
+module github.com/iemran93/devMatch
 
 go 1.23.0
 

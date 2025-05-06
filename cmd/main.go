@@ -7,9 +7,9 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/api/route"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/iemran93/devMatch/api/route"
+	"github.com/iemran93/devMatch/bootstrap"
+	"github.com/iemran93/devMatch/utils"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"

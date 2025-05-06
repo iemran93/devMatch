@@ -3,7 +3,7 @@ package domain
 import (
 	"context"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
+	"github.com/iemran93/devMatch/bootstrap"
 )
 
 type SignupRequest struct {

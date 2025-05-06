@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
+	"github.com/iemran93/devMatch/bootstrap"
+	"github.com/iemran93/devMatch/domain"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"

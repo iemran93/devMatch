@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/repository"
+	"github.com/iemran93/devMatch/domain"
+	"github.com/iemran93/devMatch/repository"
 )
 
 type userUseCase struct {

@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/domain"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/utils"
+	"github.com/iemran93/devMatch/bootstrap"
+	"github.com/iemran93/devMatch/domain"
+	"github.com/iemran93/devMatch/utils"
 
 	log "github.com/sirupsen/logrus"
 )

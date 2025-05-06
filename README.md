@@ -15,7 +15,6 @@ This is a template repository for building a Golang backend application followin
 
 **Edit the project to suit your needs after you use it as a template.**
 
-
 Please ⭐️ this repository if this project helped you, also contributions are welcome 🙏🏼
 
 ## Getting Started
@@ -31,18 +30,17 @@ Before you begin, ensure you have the following installed:
 - [Google Cloud Console](https://console.cloud.google.com/) project for Google Auth setup.
 
 ### Installation
+
 There are two ways to start using this template:
 
 1. Create a new repository based on this template by clicking the **Use this template** button at the top of this page.
 
-
-----
-
+---
 
 1. Clone this repository to your local machine:
 
    ```bash
-   git clone https://github.com/oguzhantasimaz/Go-Clean-Architecture-Template.git
+   git clone https://github.com/iemran93/devMatch.git
    cd your-repo-name
    ```
 
@@ -89,6 +87,7 @@ Your server should now be running at port you specified in the `.env` file.
 ```
 
 ## About Me
+
 Hello, I am Oguzhan Tasimaz, a software engineer from Turkey. I am interested in backend development, distributed systems, and cloud computing.
 You can find me on [LinkedIn](https://www.linkedin.com/in/oguzhantasimaz).
 

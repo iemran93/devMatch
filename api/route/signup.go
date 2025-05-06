@@ -4,11 +4,11 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/iemran93/devMatch/api/controller"
+	"github.com/iemran93/devMatch/bootstrap"
+	"github.com/iemran93/devMatch/repository"
+	"github.com/iemran93/devMatch/usecase"
 	"github.com/jmoiron/sqlx"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/api/controller"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/bootstrap"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/repository"
-	"github.com/oguzhantasimaz/Go-Clean-Architecture-Template/usecase"
 )
 
 func NewSignupRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router) {
