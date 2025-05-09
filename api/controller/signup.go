@@ -26,6 +26,12 @@ func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := request.Validate(); err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: domain.ErrIncorrectRequestBody.Error()})
+		return
+	}
+
 	accessToken, refreshToken, err := sc.SignupUseCase.SignUp(ctx, request, sc.Env)
 	if err != nil {
 		log.Error(err)

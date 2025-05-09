@@ -38,6 +38,7 @@ func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupReques
 	request.Password = string(encryptedPassword)
 
 	user := &domain.User{
+		Name:      request.Name,
 		Email:     request.Email,
 		Password:  request.Password,
 		CreatedAt: time.Now(),

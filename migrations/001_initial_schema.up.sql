@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `User` (
   `profile_picture` text,
   `date_of_birth` date NOT NULL,
   `availability` boolean DEFAULT true,
-  `created_at` timestamp NOT NULL,
+  `created_at` timestamp DEFAULT CURRENT_TIMESTAMP,
   UNIQUE KEY `username_unique` (`username`),
   UNIQUE KEY `email_unique` (`email`)
 );

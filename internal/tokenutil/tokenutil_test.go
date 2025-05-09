@@ -1,8 +1,10 @@
 package tokenutil_test
 
 import (
-	"github.com/stretchr/testify/assert"
+	"database/sql"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/iemran93/devMatch/domain"
 	"github.com/iemran93/devMatch/internal/tokenutil"
@@ -12,7 +14,7 @@ func TestCreateAccessToken(t *testing.T) {
 	// Test user information
 	user := &domain.User{
 		Name:     "John Doe",
-		GoogleId: "google123",
+		GoogleId: sql.NullString{String: "google123"},
 		Email:    "john@example.com",
 		Id:       123,
 	}
@@ -32,7 +34,7 @@ func TestCreateRefreshToken(t *testing.T) {
 	// Test user information
 	user := &domain.User{
 		Name:     "John Doe",
-		GoogleId: "google123",
+		GoogleId: sql.NullString{String: "google123"},
 		Email:    "john@example.com",
 		Id:       123,
 	}
@@ -55,7 +57,7 @@ func TestIsAuthorized(t *testing.T) {
 	// Create a test token
 	user := &domain.User{
 		Name:     "John Doe",
-		GoogleId: "google123",
+		GoogleId: sql.NullString{String: "google123"},
 		Email:    "john@example.com",
 		Id:       123,
 	}
@@ -76,7 +78,7 @@ func TestExtractIDFromToken(t *testing.T) {
 	// Create a test token
 	user := &domain.User{
 		Name:     "John Doe",
-		GoogleId: "google123",
+		GoogleId: sql.NullString{String: "google123"},
 		Email:    "john@example.com",
 		Id:       123,
 	}

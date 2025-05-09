@@ -30,7 +30,7 @@ func NewUserRepository(db *sqlx.DB) UserRepository {
 
 func (r *userRepository) GetUsers(ctx context.Context) ([]*domain.User, error) {
 	var users []*domain.User
-	err := r.db.Select(&users, "SELECT * FROM users")
+	err := r.db.Select(&users, "SELECT * FROM User")
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +40,7 @@ func (r *userRepository) GetUsers(ctx context.Context) ([]*domain.User, error) {
 
 func (r *userRepository) GetUserById(ctx context.Context, id int) (*domain.User, error) {
 	user := domain.User{}
-	err := r.db.Get(&user, `SELECT * FROM users WHERE id = ?`, id)
+	err := r.db.Get(&user, `SELECT * FROM User WHERE id = ?`, id)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (r *userRepository) GetUserById(ctx context.Context, id int) (*domain.User,
 
 func (r *userRepository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
 	user := domain.User{}
-	err := r.db.Get(&user, `SELECT * FROM users WHERE email = ?`, email)
+	err := r.db.Get(&user, `SELECT * FROM User WHERE email = ?`, email)
 	if err != nil {
 		return nil, err
 	}
@@ -65,8 +65,8 @@ func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*do
 	}
 	defer tx.Commit()
 
-	if user.GoogleId != "" {
-		res, err := tx.NamedExec(`INSERT INTO users (email, google_id, name, profile_picture) VALUES (:email, :google_id, :name, :profile_picture)`, user)
+	if user.GoogleId.Valid {
+		res, err := tx.NamedExec(`INSERT INTO User (email, google_id, name, profile_picture) VALUES (:email, :google_id, :name, :profile_picture)`, user)
 		if err != nil {
 			tx.Rollback()
 			return nil, err
@@ -81,7 +81,7 @@ func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*do
 		return user, nil
 	}
 
-	res, err := tx.NamedExec(`INSERT INTO users (email, password) VALUES (:email, :password) `, user)
+	res, err := tx.NamedExec(`INSERT INTO User (email, password, name) VALUES (:email, :password, :name) `, user)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -125,12 +125,12 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *domain.User) erro
 	if user.Password != "" {
 		fieldsQuery += "password = :password,"
 	}
-	if user.Phone != "" {
-		fieldsQuery += "phone = :phone,"
+	if user.Availability {
+		fieldsQuery += "availability = :availabilit,"
 	}
 	fieldsQuery = fieldsQuery[:len(fieldsQuery)-1]
 
-	_, err = tx.NamedExec("UPDATE users SET "+fieldsQuery+" WHERE id = :id", user)
+	_, err = tx.NamedExec("UPDATE User SET "+fieldsQuery+" WHERE id = :id", user)
 	if err != nil {
 		tx.Rollback()
 		return err
@@ -146,7 +146,7 @@ func (r *userRepository) DeleteUser(ctx context.Context, userId int) error {
 	}
 	defer tx.Commit()
 
-	_, err = tx.Exec("DELETE FROM users WHERE id = ?", userId)
+	_, err = tx.Exec("DELETE FROM User WHERE id = ?", userId)
 	if err != nil {
 		tx.Rollback()
 		return err

@@ -12,7 +12,7 @@ func CreateAccessToken(user *domain.User, secret string, expiry int) (accessToke
 	exp := time.Now().Add(time.Hour * time.Duration(expiry))
 	claims := &domain.JwtCustomClaims{
 		Name:     user.Name,
-		GoogleId: user.GoogleId,
+		GoogleId: user.GoogleId.String,
 		Email:    user.Email,
 		ID:       user.Id,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -31,7 +31,7 @@ func CreateRefreshToken(user *domain.User, secret string, expiry int) (refreshTo
 	claimsRefresh := &domain.JwtCustomRefreshClaims{
 		ID:       user.Id,
 		Name:     user.Name,
-		GoogleId: user.GoogleId,
+		GoogleId: user.GoogleId.String,
 		Email:    user.Email,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * time.Duration(expiry))),

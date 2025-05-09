@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"testing"
 	"time"
@@ -80,11 +81,11 @@ func TestGetUserById_Success(t *testing.T) {
 	// Prepare test data
 	expectedUser := &domain.User{
 		Id:             1,
-		GoogleId:       "some-google-id",
-		ProfilePicture: "https://example.com/profile-picture.png",
+		GoogleId:       sql.NullString{String: "some-google-id"},
+		ProfilePicture: sql.NullString{String: "https://example.com/profile-picture.png"},
 		Name:           "John Doe",
 		Email:          "john@example.com",
-		Phone:          "1234567890",
+		Availability:   true,
 		CreatedAt:      timeNow,
 	}
 
@@ -98,11 +99,11 @@ func TestGetUserById_Success(t *testing.T) {
 	userResponse, err := uu.GetUserById(context.Background(), 1)
 	user := &domain.User{
 		Id:             userResponse.Id,
-		GoogleId:       userResponse.GoogleId,
-		ProfilePicture: userResponse.ProfilePicture,
+		GoogleId:       sql.NullString{String: userResponse.GoogleId},
+		ProfilePicture: sql.NullString{String: userResponse.ProfilePicture},
 		Name:           userResponse.Name,
 		Email:          userResponse.Email,
-		Phone:          userResponse.Phone,
+		Availability:   userResponse.Availability,
 		CreatedAt:      userResponse.CreatedAt,
 	}
 
@@ -114,7 +115,7 @@ func TestGetUserById_Success(t *testing.T) {
 	assert.Equal(t, expectedUser.ProfilePicture, user.ProfilePicture)
 	assert.Equal(t, expectedUser.Name, user.Name)
 	assert.Equal(t, expectedUser.Email, user.Email)
-	assert.Equal(t, expectedUser.Phone, user.Phone)
+	assert.Equal(t, expectedUser.Availability, user.Availability)
 	assert.Equal(t, expectedUser.CreatedAt, user.CreatedAt)
 
 	// Ensure that the mock repository's GetUserById function was called with the correct arguments
@@ -149,11 +150,11 @@ func TestGetUsers_Success(t *testing.T) {
 	// Prepare test data
 	expectedUser := &domain.User{
 		Id:             1,
-		GoogleId:       "some-google-id",
-		ProfilePicture: "https://example.com/profile-picture.png",
+		GoogleId:       sql.NullString{String: "some-google-id"},
+		ProfilePicture: sql.NullString{String: "https://example.com/profile-picture.png"},
 		Name:           "John Doe",
 		Email:          "john@example.com",
-		Phone:          "1234567890",
+		Availability:   true,
 		CreatedAt:      time.Now(),
 	}
 
@@ -171,11 +172,11 @@ func TestGetUsers_Success(t *testing.T) {
 	for _, user := range usersResponse {
 		users = append(users, &domain.User{
 			Id:             user.Id,
-			GoogleId:       user.GoogleId,
-			ProfilePicture: user.ProfilePicture,
+			GoogleId:       sql.NullString{String: user.GoogleId},
+			ProfilePicture: sql.NullString{String: user.ProfilePicture},
 			Name:           user.Name,
 			Email:          user.Email,
-			Phone:          user.Phone,
+			Availability:   user.Availability,
 			CreatedAt:      user.CreatedAt,
 		})
 	}
@@ -217,11 +218,11 @@ func TestUpdateUsers_Success(t *testing.T) {
 	// Prepare test data
 	expectedUser := &domain.User{
 		Id:             1,
-		GoogleId:       "some-google-id",
-		ProfilePicture: "https://example.com/profile-picture.png",
+		GoogleId:       sql.NullString{String: "some-google-id"},
+		ProfilePicture: sql.NullString{String: "https://example.com/profile-picture.png"},
 		Name:           "John Doe",
 		Email:          "john@example.com",
-		Phone:          "1234567890",
+		Availability:   true,
 		CreatedAt:      timeNow,
 	}
 
@@ -248,11 +249,11 @@ func TestUpdateUsers_Error(t *testing.T) {
 	// Prepare test data
 	expectedUser := &domain.User{
 		Id:             1,
-		GoogleId:       "some-google-id",
-		ProfilePicture: "https://example.com/profile-picture.png",
+		GoogleId:       sql.NullString{String: "some-google-id"},
+		ProfilePicture: sql.NullString{String: "https://example.com/profile-picture.png"},
 		Name:           "John Doe",
 		Email:          "john@example.com",
-		Phone:          "1234567890",
+		Availability:   true,
 		CreatedAt:      timeNow,
 	}
 
@@ -279,11 +280,11 @@ func TestDeleteUsers_Success(t *testing.T) {
 	// Prepare test data
 	expectedUser := &domain.User{
 		Id:             1,
-		GoogleId:       "some-google-id",
-		ProfilePicture: "https://example.com/profile-picture.png",
+		GoogleId:       sql.NullString{String: "some-google-id"},
+		ProfilePicture: sql.NullString{String: "https://example.com/profile-picture.png"},
 		Name:           "John Doe",
 		Email:          "john@example.com",
-		Phone:          "1234567890",
+		Availability:   true,
 		CreatedAt:      timeNow,
 	}
 
@@ -310,11 +311,11 @@ func TestDeleteUsers_Error(t *testing.T) {
 	// Prepare test data
 	expectedUser := &domain.User{
 		Id:             1,
-		GoogleId:       "some-google-id",
-		ProfilePicture: "https://example.com/profile-picture.png",
+		GoogleId:       sql.NullString{String: "some-google-id"},
+		ProfilePicture: sql.NullString{String: "https://example.com/profile-picture.png"},
 		Name:           "John Doe",
 		Email:          "john@example.com",
-		Phone:          "1234567890",
+		Availability:   true,
 		CreatedAt:      timeNow,
 	}
 

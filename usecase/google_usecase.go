@@ -40,8 +40,8 @@ func (lu *googleUseCase) GoogleLogin(ctx context.Context, data []byte, env *boot
 	}
 
 	user := &domain.User{
-		GoogleId:       googleUser.Id,
-		ProfilePicture: googleUser.Picture,
+		GoogleId:       sql.NullString{String: googleUser.Id},
+		ProfilePicture: sql.NullString{String: googleUser.Picture},
 		Email:          googleUser.Email,
 		Name:           googleUser.Name,
 	}

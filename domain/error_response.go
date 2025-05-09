@@ -18,4 +18,5 @@ var (
 	ErrFailedToReadResponse      = errors.New("failed to read response")
 	ErrUnexpectedSigningMethod   = errors.New("unexpected signing method")
 	ErrInvalidToken              = errors.New("invalid token")
+	ErrIncorrectRequestBody      = errors.New("incorrect request body")
 )

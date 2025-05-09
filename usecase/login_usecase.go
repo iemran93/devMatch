@@ -33,7 +33,7 @@ func (lu *loginUseCase) Login(ctx context.Context, request domain.LoginRequest, 
 		return
 	}
 
-	if user.GoogleId != "" {
+	if user.GoogleId.Valid {
 		log.Error("User should login with Google")
 		err = domain.ErrUserShouldLoginWithGoogle
 		return

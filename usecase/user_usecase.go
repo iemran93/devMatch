@@ -31,11 +31,11 @@ func (uu *userUseCase) GetUsers(c context.Context) ([]*domain.UserResponse, erro
 	for _, user := range users {
 		urs = append(urs, &domain.UserResponse{
 			Id:             user.Id,
-			GoogleId:       user.GoogleId,
-			ProfilePicture: user.ProfilePicture,
+			GoogleId:       user.GoogleId.String,
+			ProfilePicture: user.ProfilePicture.String,
 			Name:           user.Name,
 			Email:          user.Email,
-			Phone:          user.Phone,
+			Availability:   user.Availability,
 			CreatedAt:      user.CreatedAt,
 		})
 	}
@@ -52,11 +52,11 @@ func (uu *userUseCase) GetUserById(c context.Context, id int) (*domain.UserRespo
 	}
 	ur = &domain.UserResponse{
 		Id:             user.Id,
-		GoogleId:       user.GoogleId,
-		ProfilePicture: user.ProfilePicture,
+		GoogleId:       user.GoogleId.String,
+		ProfilePicture: user.ProfilePicture.String,
 		Name:           user.Name,
 		Email:          user.Email,
-		Phone:          user.Phone,
+		Availability:   user.Availability,
 		CreatedAt:      user.CreatedAt,
 	}
 	return ur, nil

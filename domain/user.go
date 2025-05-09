@@ -2,19 +2,20 @@ package domain
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
 type User struct {
-	Id             int       `json:"id" db:"id"`
-	GoogleId       string    `json:"google_id" db:"google_id"`
-	ProfilePicture string    `json:"profile_picture" db:"profile_picture"`
-	Name           string    `json:"name" db:"name"`
-	Password       string    `json:"password" db:"password"`
-	Email          string    `json:"email" db:"email"`
-	Phone          string    `json:"phone" db:"phone"`
-	CreatedAt      time.Time `json:"created_at" db:"created_at"`
-	UpdatedAt      time.Time `json:"updated_at" db:"updated_at"`
+	Id             int            `json:"id" db:"id"`
+	GoogleId       sql.NullString `json:"google_id" db:"google_id"`
+	ProfilePicture sql.NullString `json:"profile_picture" db:"profile_picture"`
+	Name           string         `json:"name" db:"name"`
+	Password       string         `json:"password" db:"password"`
+	Email          string         `json:"email" db:"email"`
+	Availability   bool           `json:"availability" db:"availability"`
+	CreatedAt      time.Time      `json:"created_at" db:"created_at"`
+	UpdatedAt      time.Time      `json:"updated_at" db:"updated_at"`
 }
 
 type UserResponse struct {
@@ -23,7 +24,7 @@ type UserResponse struct {
 	ProfilePicture string    `json:"profile_picture" db:"profile_picture"`
 	Name           string    `json:"name" db:"name"`
 	Email          string    `json:"email" db:"email"`
-	Phone          string    `json:"phone" db:"phone"`
+	Availability   bool      `json:"availability" db:"availability"`
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 }
 
