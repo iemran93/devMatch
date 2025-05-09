@@ -29,12 +29,15 @@ func main() {
 
 	route.Setup(env, timeout, db, r)
 
+	// Create CORS handler
+	corsHandler := bootstrap.NewCorsHandler()
+
 	srv := &http.Server{
 		Addr:         env.ServerAddress,
 		WriteTimeout: time.Second * 15,
 		ReadTimeout:  time.Second * 15,
 		IdleTimeout:  time.Second * 60,
-		Handler:      r,
+		Handler:      corsHandler.Handler(r),
 	}
 
 	go func() {

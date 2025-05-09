@@ -26,17 +26,14 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	accessToken, refreshToken, err := lc.LoginUseCase.Login(ctx, request, lc.Env)
+	resp, err := lc.LoginUseCase.Login(ctx, request, lc.Env)
 	if err != nil {
 		log.Error(err)
 		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	response := domain.LoginResponse{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-	}
+	response := resp
 
 	utils.JSON(w, http.StatusOK, response)
 	return

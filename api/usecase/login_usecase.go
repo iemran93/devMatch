@@ -25,7 +25,7 @@ func NewLoginUseCase(userRepository repository.UserRepository, timeout time.Dura
 	}
 }
 
-func (lu *loginUseCase) Login(ctx context.Context, request domain.LoginRequest, env *bootstrap.Env) (accessToken string, refreshToken string, err error) {
+func (lu *loginUseCase) Login(ctx context.Context, request domain.LoginRequest, env *bootstrap.Env) (loginResponse domain.LoginResponse, err error) {
 	var user *domain.User
 	user, err = lu.userRepository.GetUserByEmail(ctx, request.Email)
 	if err != nil {
@@ -45,17 +45,23 @@ func (lu *loginUseCase) Login(ctx context.Context, request domain.LoginRequest, 
 		return
 	}
 
-	accessToken, err = tokenutil.CreateAccessToken(user, env.AccessTokenSecret, env.AccessTokenExpiryHour)
+	accessToken, err := tokenutil.CreateAccessToken(user, env.AccessTokenSecret, env.AccessTokenExpiryHour)
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
-	refreshToken, err = tokenutil.CreateRefreshToken(user, env.RefreshTokenSecret, env.RefreshTokenExpiryHour)
+	refreshToken, err := tokenutil.CreateRefreshToken(user, env.RefreshTokenSecret, env.RefreshTokenExpiryHour)
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
-	return accessToken, refreshToken, nil
+	return domain.LoginResponse{
+		Id:           user.Id,
+		Name:         user.Name,
+		Email:        user.Email,
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}, nil
 }
