@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"strings"
 
 	"github.com/iemran93/devMatch/domain"
 	"github.com/iemran93/devMatch/internal/tokenutil"
@@ -14,10 +13,8 @@ func JwtAuthMiddleware(secret string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(
 			func(w http.ResponseWriter, r *http.Request) {
-				authHeader := r.Header.Get("Authorization")
-				t := strings.Split(authHeader, " ")
-				if len(t) == 2 {
-					authToken := t[1]
+				authToken, err := utils.GetCookie(r, "access_token")
+				if err == nil {
 					authorized, err := tokenutil.IsAuthorized(authToken, secret)
 					if err != nil {
 						utils.JSON(w, 401, domain.ErrorResponse{Message: err.Error()})
@@ -43,3 +40,6 @@ func JwtAuthMiddleware(secret string) func(next http.Handler) http.Handler {
 			})
 	}
 }
+
+// authHeader := r.Header.Get("Authorization")
+// t := strings.Split(authHeader, " ")

@@ -25,5 +25,7 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router
 	NewSignupRouter(env, timeout, db, public)
 	NewLoginRouter(env, timeout, db, public)
 	NewRefreshTokenRouter(env, timeout, db, public)
+	NewLogoutRouter(env, timeout, db, public)
+
 	NewUserRouter(env, timeout, db, protectedRouter)
 }

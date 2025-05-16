@@ -18,10 +18,6 @@ type SignupResponse struct {
 	RefreshToken string `json:"refreshToken"`
 }
 
-type SignupUseCase interface {
-	SignUp(ctx context.Context, request SignupRequest, env *bootstrap.Env) (accessToken string, refreshToken string, err error)
-}
-
 func (sr *SignupRequest) Validate() error {
 	v := validator.New()
 	err := v.Struct(sr)
@@ -30,3 +26,8 @@ func (sr *SignupRequest) Validate() error {
 	}
 	return nil
 }
+
+type SignupUseCase interface {
+	SignUp(ctx context.Context, request SignupRequest, env *bootstrap.Env) (accessToken string, refreshToken string, err error)
+}
+

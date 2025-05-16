@@ -26,12 +26,21 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := request.Validate(); err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: domain.ErrIncorrectRequestBody.Error()})
+		return
+	}
+
 	resp, err := lc.LoginUseCase.Login(ctx, request, lc.Env)
 	if err != nil {
 		log.Error(err)
 		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
+
+	utils.SetCookie(w, "access_token", resp.AccessToken)
+	utils.SetCookie(w, "refresh_token", resp.RefreshToken)
 
 	response := resp
 

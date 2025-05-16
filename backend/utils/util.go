@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/iemran93/devMatch/bootstrap"
@@ -37,10 +38,29 @@ func MigrateDB(db *sqlx.DB, env *bootstrap.Env) {
 }
 
 func SetCookie(w http.ResponseWriter, name string, value string) {
+	// For development environment (http://localhost)
+	// In production, you'd set Secure: true
 	cookie := http.Cookie{
-		Name:  name,
-		Value: value,
-		Path:  "/",
+		Name:     name,
+		Value:    value,
+		Path:     "/",
+		HttpOnly: true,                 // Prevents JavaScript access
+		SameSite: http.SameSiteLaxMode, // Allows the cookie to be sent in same-site requests and top-level navigations
+		MaxAge:   86400 * 30,           // 30 days
 	}
+
 	http.SetCookie(w, &cookie)
+}
+
+func GetCookie(r *http.Request, name string) (string, error) {
+	cookie, err := r.Cookie(name)
+	if err != nil {
+		switch {
+		case errors.Is(err, http.ErrNoCookie):
+			return "", errors.New("cookie not found")
+		default:
+			return "", errors.New("server error")
+		}
+	}
+	return cookie.Value, nil
 }

@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/iemran93/devMatch/bootstrap"
 )
 
@@ -18,6 +19,15 @@ type LoginResponse struct {
 	User         string `json:"user"`
 	AccessToken  string `json:"accessToken"`
 	RefreshToken string `json:"refreshToken"`
+}
+
+func (lr *LoginRequest) Validate() error {
+	v := validator.New()
+	err := v.Struct(lr)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type LoginUseCase interface {
