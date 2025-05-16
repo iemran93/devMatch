@@ -13,6 +13,8 @@ export interface LoginCredentials {
     id: string;
     name: string;
     email: string;
+    profilePicture?: string;
+    googleId?: string;
     // Add other user properties as needed
   }
   
@@ -30,7 +32,11 @@ export interface LoginCredentials {
     refreshToken?: string;
     message?: string;
   }
-  
+
+  export interface GoogleAuthURLResponse {
+    url: string;
+  }
+
   export interface ErrorResponse {
     message: string;
   }

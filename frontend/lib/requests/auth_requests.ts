@@ -1,10 +1,7 @@
-/**
- * API utilities for authentication
- */
+import { Are_You_Serious } from 'next/font/google';
 import axiosClient from '../axiosClient';
-import { AUTH_ROUTES } from '../config';
-import {LoginCredentials, SignupCredentials, User, AuthResponse, RefreshTokenResponse } from '../types/auth_types';
-import {ErrorResponse} from "../types/error_types"
+import { AUTH_ROUTES, API_CONFIG } from '../config';
+import {LoginCredentials, SignupCredentials, User, AuthResponse, RefreshTokenResponse, GoogleAuthURLResponse } from '../types/auth_types';
 
 export async function loginUser(credentials: LoginCredentials): Promise<AuthResponse> {
   try {
@@ -57,4 +54,12 @@ export async function logoutUser(): Promise<void> {
     console.error('Logout failed:', error);
     throw new Error('Failed to logout');
   }
+}
+
+// Simplified Google login implementation
+// Instead of fetching the URL, we directly redirect to the backend endpoint
+// and let the browser handle the 302 redirect from there
+export function initiateGoogleLogin(): void {
+  // This will directly redirect to the Google OAuth flow
+  window.location.href = `${API_CONFIG.BASE_URL}${AUTH_ROUTES.GOOGLELOGIN}`;
 } 
