@@ -67,5 +67,12 @@ func (gc *GoogleController) HandleGoogleCallback(w http.ResponseWriter, r *http.
 	utils.SetCookie(w, "refresh_token", refreshToken)
 
 	// redirect to home page
-	http.Redirect(w, r, "/profile", http.StatusTemporaryRedirect)
+	frontendURL := gc.Env.FrontendURL
+	if frontendURL == "" {
+		frontendURL = "http://localhost:3000" // Default frontend URL if not specified in environment
+	}
+
+	http.Redirect(w, r, frontendURL+"/", http.StatusTemporaryRedirect)
+
+	return
 }

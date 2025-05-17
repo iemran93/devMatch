@@ -15,9 +15,7 @@ export function GoogleLoginButton({ className = "" }: GoogleLoginButtonProps) {
   const handleGoogleLogin = () => {
     try {
       setIsLoading(true);
-      // Call the simplified Google login function
       initiateGoogleLogin();
-      // Loading state will remain true as we're redirecting away
     } catch (error) {
       setIsLoading(false);
       console.error("Google login failed:", error);
