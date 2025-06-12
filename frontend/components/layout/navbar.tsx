@@ -154,7 +154,6 @@ export function Navbar() {
                 </div>
                 <SheetFooter className="mt-auto">
                   <Separator className="my-4" />
-                  <ToggleTheme />
                 </SheetFooter>
               </SheetContent>
             </Sheet>

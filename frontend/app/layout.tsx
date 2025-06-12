@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/layout/navbar";
 import { ThemeProvider } from "@/components/layout/theme-provider";
 import { Providers } from "@/providers";
-import { Toaster } from "sonner";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -54,7 +54,7 @@ export default function RootLayout({
           >
             <Navbar />
             {children}
-            <Toaster position="top-right" richColors />
+            <Toaster />
           </ThemeProvider>
         </Providers>
       </body>

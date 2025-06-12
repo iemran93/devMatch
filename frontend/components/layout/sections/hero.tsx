@@ -5,9 +5,12 @@ import { ArrowRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuth } from "@/context/auth-context";
 
 export const HeroSection = () => {
   const { theme } = useTheme();
+  const { isAuthenticated } = useAuth();
+
   return (
     <section className="container w-full">
       <div className="grid place-items-center lg:max-w-screen-xl gap-8 mx-auto py-20 md:py-32">
@@ -28,15 +31,26 @@ export const HeroSection = () => {
           </p>
 
           <div className="space-y-4 md:space-y-0 md:space-x-4">
-            <Button className="w-5/6 md:w-1/4 font-bold group/arrow">
-              New Project
-              <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
-            </Button>
+            {isAuthenticated ? (
+              <Button asChild className="w-5/6 md:w-1/4 font-bold group/arrow">
+                <Link href="/projects/create">
+                  Create Project
+                  <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            ) : (
+              <Button asChild className="w-5/6 md:w-1/4 font-bold group/arrow">
+                <Link href="/login">
+                  Get Started
+                  <ArrowRight className="size-5 ml-2 group-hover/arrow:translate-x-1 transition-transform" />
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
 
         <div className="relative group mt-14">
-              {/* images maybe */}
+          {/* images maybe */}
           <div className="absolute bottom-0 left-0 w-full h-20 md:h-28 bg-gradient-to-b from-background/0 via-background/50 to-background rounded-lg"></div>
         </div>
       </div>
