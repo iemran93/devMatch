@@ -14,6 +14,7 @@ import { ServicesSection } from "@/components/layout/sections/services";
 import { SponsorsSection } from "@/components/layout/sections/sponsors";
 import { TeamSection } from "@/components/layout/sections/team";
 import { TestimonialSection } from "@/components/layout/sections/testimonial";
+import { Projects } from "@/components/layout/sections/Project";
 
 export default function Home() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -45,7 +46,8 @@ export default function Home() {
       )}
 
       <HeroSection />
-      <SponsorsSection />
+      <Projects />
+      {/* <SponsorsSection />
       <BenefitsSection />
       <FeaturesSection />
       <ServicesSection />
@@ -55,7 +57,7 @@ export default function Home() {
       <PricingSection />
       <ContactSection />
       <FAQSection />
-      <FooterSection />
+      <FooterSection /> */}
     </>
   );
 }

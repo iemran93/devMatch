@@ -28,4 +28,7 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router
 	NewLogoutRouter(env, timeout, db, public)
 
 	NewUserRouter(env, timeout, db, protectedRouter)
+
+	// Register project routes with proper separation of public and protected routes
+	NewProjectRouter(env, timeout, db, public, protectedRouter)
 }

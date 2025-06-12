@@ -46,9 +46,10 @@ export function Navbar() {
   // Navigation links for both desktop and mobile
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/#features", label: "Features" },
-    { href: "/#pricing", label: "Pricing" },
-    { href: "/#contact", label: "Contact" },
+    { href: "/#projects", label: "Projects" },
+    // { href: "/#features", label: "Features" },
+    // { href: "/#pricing", label: "Pricing" },
+    // { href: "/#contact", label: "Contact" },
   ];
 
   return (
@@ -81,6 +82,9 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-4">
+          {/* Theme toggle - visible on all screen sizes */}
+          <ToggleTheme />
+          
           {/* Mobile menu button - only visible on mobile */}
           <div className="block md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
