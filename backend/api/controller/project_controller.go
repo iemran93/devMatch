@@ -25,14 +25,21 @@ func (pc *ProjectController) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := req.Validate(); err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: domain.ErrIncorrectRequestBody.Error()})
+		return
+	}
+
 	ctx := r.Context()
-	if err := pc.ProjectUseCase.Create(ctx, &req); err != nil {
+	project, err := pc.ProjectUseCase.Create(ctx, &req)
+	if err != nil {
 		log.Error(err)
 		utils.JSON(w, http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	utils.JSON(w, http.StatusCreated, "Project created successfully")
+	utils.JSON(w, http.StatusCreated, project)
 }
 
 func (pc *ProjectController) GetById(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +68,7 @@ func (pc *ProjectController) GetById(w http.ResponseWriter, r *http.Request) {
 }
 
 func (pc *ProjectController) List(w http.ResponseWriter, r *http.Request) {
-	filters := make(map[string]interface{})
+	filters := make(map[string]any)
 
 	// Parse query parameters
 	if stage := r.URL.Query().Get("stage"); stage != "" {
@@ -98,16 +105,21 @@ func (pc *ProjectController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var project domain.Project
-	if err := json.NewDecoder(r.Body).Decode(&project); err != nil {
+	var req domain.CreateProjectRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Error(err)
 		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
 		return
 	}
 
-	project.Id = id
+	err = req.Validate()
+	if err != nil {
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: domain.ErrIncorrectRequestBody.Error()})
+		return
+	}
+
 	ctx := r.Context()
-	if err := pc.ProjectUseCase.Update(ctx, &project); err != nil {
+	if err := pc.ProjectUseCase.Update(ctx, &req, id); err != nil {
 		if err == domain.ErrUnauthorized {
 			utils.JSON(w, http.StatusForbidden, domain.ErrorResponse{Message: "Not authorized to update this project"})
 			return

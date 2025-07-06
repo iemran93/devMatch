@@ -19,12 +19,21 @@ func NewProjectRepository(db *sqlx.DB) domain.ProjectRepository {
 	}
 }
 
-func (r *projectRepository) Create(ctx context.Context, project *domain.Project) error {
+func (r *projectRepository) Create(ctx context.Context, req *domain.CreateProjectRequest, creator_id int) (int, error) {
 	tx, err := r.db.Beginx()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer tx.Rollback()
+
+	project := domain.Project{
+		Title:       req.Title,
+		Description: req.Description,
+		Goals:       req.Goals,
+		CategoryId:  req.CategoryId,
+		Stage:       req.Stage,
+		CreatorId:   creator_id,
+	}
 
 	// Set timestamps
 	now := time.Now()
@@ -34,49 +43,67 @@ func (r *projectRepository) Create(ctx context.Context, project *domain.Project)
 	// Insert project
 	result, err := tx.NamedExec(`
 		INSERT INTO Project (
-			title, description, goals, category_id, project_type_id,
+			title, description, goals, category_id,
 			stage, created_at, updated_at, creator_id
 		) VALUES (
-			:title, :description, :goals, :category_id, :project_type_id,
+			:title, :description, :goals, :category_id,
 			:stage, :created_at, :updated_at, :creator_id
 		)
 	`, project)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	projectId, err := result.LastInsertId()
 	if err != nil {
-		return err
+		return 0, err
 	}
 
 	// Insert technologies
-	if len(project.Technologies) > 0 {
-		for _, techId := range project.Technologies {
+	if len(req.Technologies) > 0 {
+		for _, techId := range req.Technologies {
 			_, err = tx.Exec(`
 				INSERT INTO ProjectTechnology (project_id, technology_id)
 				VALUES (?, ?)
 			`, projectId, techId)
 			if err != nil {
-				return err
+				return 0, err
 			}
 		}
 	}
 
 	// Insert languages
-	if len(project.Languages) > 0 {
-		for _, langId := range project.Languages {
+	if len(req.Languages) > 0 {
+		for _, langId := range req.Languages {
 			_, err = tx.Exec(`
 				INSERT INTO ProjectLanguage (project_id, language_id)
 				VALUES (?, ?)
 			`, projectId, langId)
 			if err != nil {
-				return err
+				return 0, err
 			}
 		}
 	}
 
-	return tx.Commit()
+	// insert types
+	if len(req.ProjectType) > 0 {
+		for _, typeId := range req.ProjectType {
+			_, err = tx.Exec(`
+				INSERT INTO ProjectType (project_id, type_id)
+				VALUES (?, ?)
+			`, projectId, typeId)
+			if err != nil {
+				return 0, err
+			}
+		}
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return 0, err
+	}
+
+	return int(projectId), nil
 }
 
 func (r *projectRepository) GetById(ctx context.Context, id int) (*domain.ProjectResponse, error) {
@@ -85,13 +112,21 @@ func (r *projectRepository) GetById(ctx context.Context, id int) (*domain.Projec
 	// Get project basic info
 	err := r.db.Get(&project, `
 		SELECT 
-			p.*,
+			p.id,
+			p.title,
+			p.description,
+			p.goals,
+			p.stage,
+			p.created_at,
+			p.updated_at,
 			u.id as "creator.id",
 			u.name as "creator.name",
 			u.email as "creator.email",
-			u.profile_picture as "creator.profile_picture"
+			c.id as "category.id",
+			c.name as "category.name"
 		FROM Project p
 		JOIN User u ON p.creator_id = u.id
+		JOIN Category c ON p.category_id = c.id
 		WHERE p.id = ?
 	`, id)
 	if err != nil {
@@ -123,6 +158,17 @@ func (r *projectRepository) GetById(ctx context.Context, id int) (*domain.Projec
 		return nil, err
 	}
 
+	// get types
+	err = r.db.Select(&project.Types, `
+			SELECT t.*
+			FROM Types t
+			JOIN ProjectType pt ON t.id = pt.type_id
+			WHERE pt.project_id = ?
+		`, id)
+	if err != nil {
+		return nil, err
+	}
+
 	return &project, nil
 }
 
@@ -131,18 +177,22 @@ func (r *projectRepository) List(ctx context.Context, filters map[string]interfa
 
 	query := `
 		SELECT DISTINCT
-			p.*,
-			u.id as "creator.id",
-			u.name as "creator.name",
-			u.email as "creator.email",
-			u.profile_picture as "creator.profile_picture"
+			p.id, p.title, p.description, p.goals, p.stage, p.created_at, p.updated_at, p.creator_id, p.category_id,
+			u.id as user_id, u.name as user_name, u.email as user_email,
+			c.id as category_id, c.name as category_name
 		FROM Project p
 		JOIN User u ON p.creator_id = u.id
+		JOIN Category c ON p.category_id = c.id
 	`
 
-	// Build WHERE clause based on filters
+	// Add JOIN for project_type_id filter if needed
+	if _, ok := filters["project_type_id"].(int); ok {
+		query += " JOIN ProjectType pt ON p.id = pt.project_id"
+	}
+
+	// Build WHERE clause (keep your existing logic)
 	whereClause := ""
-	args := []interface{}{}
+	args := []any{}
 
 	if stage, ok := filters["stage"].(string); ok {
 		if whereClause == "" {
@@ -160,7 +210,7 @@ func (r *projectRepository) List(ctx context.Context, filters map[string]interfa
 		} else {
 			whereClause += " AND "
 		}
-		whereClause += "p.project_type_id = ?"
+		whereClause += "pt.type_id = ?" // Changed this line
 		args = append(args, projectType)
 	}
 
@@ -176,13 +226,35 @@ func (r *projectRepository) List(ctx context.Context, filters map[string]interfa
 
 	query += whereClause + " ORDER BY p.created_at DESC"
 
-	// Execute the query
-	err := r.db.Select(&projects, query, args...)
+	// Execute the query (you'll need to handle the scanning differently due to aliases)
+	rows, err := r.db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
-	// For each project, get its technologies and languages
+	for rows.Next() {
+		var project domain.ProjectResponse
+		var userId int
+		var userName, userEmail string
+		var categoryId int
+		var categoryName string
+
+		err = rows.Scan(
+			&project.Id, &project.Title, &project.Description, &project.Goals,
+			&project.Stage, &project.CreatedAt, &project.UpdatedAt, &project.Creator.Id, &categoryId,
+			&userId, &userName, &userEmail, &categoryId, &categoryName,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		project.Creator = domain.UserResponse{Id: userId, Name: userName, Email: userEmail}
+		project.Category = domain.Category{Id: categoryId, Name: categoryName}
+		projects = append(projects, project)
+	}
+
+	// get technologies, languages, types
 	for i := range projects {
 		// Get technologies
 		err = r.db.Select(&projects[i].Technologies, `
@@ -205,28 +277,46 @@ func (r *projectRepository) List(ctx context.Context, filters map[string]interfa
 		if err != nil {
 			return nil, err
 		}
+
+		// get types
+		err = r.db.Select(&projects[i].Types, `
+			SELECT t.*
+			FROM Types t
+			JOIN ProjectType pt ON t.id = pt.type_id
+			WHERE pt.project_id = ?
+			`, projects[i].Id)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return projects, nil
 }
 
-func (r *projectRepository) Update(ctx context.Context, project *domain.Project) error {
+func (r *projectRepository) Update(ctx context.Context, req *domain.CreateProjectRequest, id int) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
 
-	project.UpdatedAt = time.Now()
+	project := domain.Project{
+		Id:          id,
+		Title:       req.Title,
+		Description: req.Description,
+		Goals:       req.Goals,
+		CategoryId:  req.CategoryId,
+		Stage:       req.Stage,
+		UpdatedAt:   time.Now(),
+	}
 
-	// Update project
+	// Insert project
 	_, err = tx.NamedExec(`
 		UPDATE Project SET
 			title = :title,
 			description = :description,
 			goals = :goals,
 			category_id = :category_id,
-			project_type_id = :project_type_id,
 			stage = :stage,
 			updated_at = :updated_at
 		WHERE id = :id
@@ -235,18 +325,18 @@ func (r *projectRepository) Update(ctx context.Context, project *domain.Project)
 		return err
 	}
 
-	// Update technologies
-	_, err = tx.Exec("DELETE FROM ProjectTechnology WHERE project_id = ?", project.Id)
+	_, err = tx.Exec("DELETE FROM ProjectTechnology WHERE project_id = ?", id)
 	if err != nil {
 		return err
 	}
 
-	if len(project.Technologies) > 0 {
-		for _, techId := range project.Technologies {
+	// update technologies
+	if len(req.Technologies) > 0 {
+		for _, techId := range req.Technologies {
 			_, err = tx.Exec(`
 				INSERT INTO ProjectTechnology (project_id, technology_id)
 				VALUES (?, ?)
-			`, project.Id, techId)
+			`, id, techId)
 			if err != nil {
 				return err
 			}
@@ -254,23 +344,40 @@ func (r *projectRepository) Update(ctx context.Context, project *domain.Project)
 	}
 
 	// Update languages
-	_, err = tx.Exec("DELETE FROM ProjectLanguage WHERE project_id = ?", project.Id)
+	_, err = tx.Exec("DELETE FROM ProjectLanguage WHERE project_id = ?", id)
 	if err != nil {
 		return err
 	}
 
-	if len(project.Languages) > 0 {
-		for _, langId := range project.Languages {
+	if len(req.Languages) > 0 {
+		for _, langId := range req.Languages {
 			_, err = tx.Exec(`
 				INSERT INTO ProjectLanguage (project_id, language_id)
 				VALUES (?, ?)
-			`, project.Id, langId)
+			`, id, langId)
 			if err != nil {
 				return err
 			}
 		}
 	}
 
+	// Update types
+	_, err = tx.Exec("DELETE FROM ProjectType WHERE project_id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	if len(req.ProjectType) > 0 {
+		for _, typeId := range req.ProjectType {
+			_, err = tx.Exec(`
+				INSERT INTO ProjectType (project_id, type_id)
+				VALUES (?, ?)
+			`, id, typeId)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return tx.Commit()
 }
 
@@ -288,6 +395,11 @@ func (r *projectRepository) Delete(ctx context.Context, id int) error {
 	}
 
 	_, err = tx.Exec("DELETE FROM ProjectLanguage WHERE project_id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.Exec("DELETE FROM ProjectType WHERE project_id = ?", id)
 	if err != nil {
 		return err
 	}

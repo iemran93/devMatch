@@ -11,25 +11,22 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// NewProjectRouter sets up both public and protected project routes
 func NewProjectRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, publicRouter, protectedRouter *mux.Router) {
-	// Initialize repositories, usecases and controllers
-	projectRepository := repository.NewProjectRepository(db)
-	projectUseCase := usecase.NewProjectUseCase(projectRepository, timeout)
-	projectController := &controller.ProjectController{
-		ProjectUseCase: projectUseCase,
+	pr := repository.NewProjectRepository(db)
+	pu := usecase.NewProjectUseCase(pr, timeout)
+	pc := &controller.ProjectController{
+		ProjectUseCase: pu,
 		Env:            env,
 	}
 
-	// Public project routes (no authentication required)
-	setupPublicProjectRoutes(projectController, publicRouter)
+	// public routes
+	setupPublicProjectRoutes(pc, publicRouter)
 
-	// Protected project routes (authentication required)
-	setupProtectedProjectRoutes(projectController, protectedRouter)
+	// private routes
+	setupProtectedProjectRoutes(pc, protectedRouter)
 }
 
 func setupPublicProjectRoutes(controller *controller.ProjectController, router *mux.Router) {
-	// Public routes - accessible without authentication
 	router.HandleFunc("/projects", controller.List).Methods("GET")
 	router.HandleFunc("/projects/{id}", controller.GetById).Methods("GET")
 	// TODO: Implement these handlers in ProjectController
@@ -38,7 +35,6 @@ func setupPublicProjectRoutes(controller *controller.ProjectController, router *
 }
 
 func setupProtectedProjectRoutes(controller *controller.ProjectController, router *mux.Router) {
-	// Protected routes - require authentication
 	router.HandleFunc("/projects", controller.Create).Methods("POST")
 	router.HandleFunc("/projects/{id}", controller.Update).Methods("PUT")
 	router.HandleFunc("/projects/{id}", controller.Delete).Methods("DELETE")
