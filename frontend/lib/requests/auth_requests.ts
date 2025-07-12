@@ -1,7 +1,6 @@
-import { Are_You_Serious } from 'next/font/google';
 import axiosClient from '../axiosClient';
 import { AUTH_ROUTES, API_CONFIG } from '../config';
-import {LoginCredentials, SignupCredentials, User, AuthResponse, RefreshTokenResponse, GoogleAuthURLResponse } from '../types/auth_types';
+import {LoginCredentials, SignupCredentials, User, AuthResponse, RefreshTokenResponse } from '../types/auth_types';
 
 export async function loginUser(credentials: LoginCredentials): Promise<AuthResponse> {
   try {

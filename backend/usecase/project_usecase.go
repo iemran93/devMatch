@@ -32,7 +32,7 @@ func (pu *projectUseCase) Create(c context.Context, req *domain.CreateProjectReq
 
 	project, err := pu.projectRepository.GetById(ctx, projectId)
 	if err != nil {
-		return nil, err  
+		return nil, err
 	}
 
 	return project, nil
@@ -82,4 +82,28 @@ func (pu *projectUseCase) Delete(c context.Context, id int) error {
 	}
 
 	return pu.projectRepository.Delete(ctx, id)
+}
+
+func (pu *projectUseCase) GetCategory(c context.Context) ([]domain.Category, error) {
+	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
+	defer cancel()
+	return pu.projectRepository.GetCategory(ctx)
+}
+
+func (pu *projectUseCase) GetTechnology(c context.Context) ([]domain.Technology, error) {
+	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
+	defer cancel()
+	return pu.projectRepository.GetTechnology(ctx)
+}
+
+func (pu *projectUseCase) GetLanguage(c context.Context) ([]domain.Language, error) {
+	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
+	defer cancel()
+	return pu.projectRepository.GetLanguage(ctx)
+}
+
+func (pu *projectUseCase) GetType(c context.Context) ([]domain.Types, error) {
+	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
+	defer cancel()
+	return pu.projectRepository.GetType(ctx)
 }

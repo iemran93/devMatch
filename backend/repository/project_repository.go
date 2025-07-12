@@ -33,12 +33,19 @@ func (r *projectRepository) Create(ctx context.Context, req *domain.CreateProjec
 		CategoryId:  req.CategoryId,
 		Stage:       req.Stage,
 		CreatorId:   creator_id,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 
-	// Set timestamps
-	now := time.Now()
-	project.CreatedAt = now
-	project.UpdatedAt = now
+	projectRole := []domain.ProjectRole{}
+	for _, role := range req.ProjectRoles {
+		projectRole = append(projectRole, domain.ProjectRole{
+			Title:                  role.Title,
+			Description:            role.Description,
+			RequiredExperienceLeve: role.RequiredExperienceLeve,
+			IsFilled:               false,
+		})
+	}
 
 	// Insert project
 	result, err := tx.NamedExec(`
@@ -95,6 +102,21 @@ func (r *projectRepository) Create(ctx context.Context, req *domain.CreateProjec
 			if err != nil {
 				return 0, err
 			}
+		}
+	}
+
+	// inser project roles
+	for _, role := range projectRole {
+		role.ProjectId = int(projectId)
+		_, err = tx.NamedExec(`
+			INSERT INTO ProjectRole (
+				project_id, title, description, required_experience_level, is_filled
+			) VALUES (
+				:project_id, :title, :description, :required_experience_level, :is_filled
+			)
+		`, role)
+		if err != nil {
+			return 0, err
 		}
 	}
 
@@ -165,6 +187,16 @@ func (r *projectRepository) GetById(ctx context.Context, id int) (*domain.Projec
 			JOIN ProjectType pt ON t.id = pt.type_id
 			WHERE pt.project_id = ?
 		`, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// get roles
+	err = r.db.Select(&project.ProjectRoles, `
+		SELECT pr.*
+		FROM ProjectRole pr
+		WHERE pr.project_id = ?
+	`, id)
 	if err != nil {
 		return nil, err
 	}
@@ -288,6 +320,16 @@ func (r *projectRepository) List(ctx context.Context, filters map[string]interfa
 		if err != nil {
 			return nil, err
 		}
+
+		// get roles
+		err = r.db.Select(&projects[i].ProjectRoles, `
+			SELECT pr.*
+			FROM ProjectRole pr
+			WHERE pr.project_id = ?
+		`, projects[i].Id)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return projects, nil
@@ -378,6 +420,23 @@ func (r *projectRepository) Update(ctx context.Context, req *domain.CreateProjec
 			}
 		}
 	}
+
+	// update roles
+	_, err = tx.Exec("DELETE FROM ProjectRole WHERE project_id = ?", id)
+	if err != nil {
+		return err
+	}
+	for _, role := range req.ProjectRoles {
+		_, err = tx.Exec(`
+			INSERT INTO ProjectRole (
+				project_id, title, description, required_experience_level, is_filled
+			) VALUES (?, ?, ?, ?, ?)
+		`, id, role.Title, role.Description, role.RequiredExperienceLeve, role.IsFilled)
+		if err != nil {
+			return err
+		}
+	}
+
 	return tx.Commit()
 }
 
@@ -404,6 +463,11 @@ func (r *projectRepository) Delete(ctx context.Context, id int) error {
 		return err
 	}
 
+	_, err = tx.Exec("DELETE FROM ProjectRole WHERE project_id = ?", id)
+	if err != nil {
+		return err
+	}
+
 	// Delete project
 	_, err = tx.Exec("DELETE FROM Project WHERE id = ?", id)
 	if err != nil {
@@ -411,4 +475,40 @@ func (r *projectRepository) Delete(ctx context.Context, id int) error {
 	}
 
 	return tx.Commit()
+}
+
+func (r *projectRepository) GetCategory(ctx context.Context) ([]domain.Category, error) {
+	var categories []domain.Category
+	err := r.db.Select(&categories, "SELECT id, name FROM Category")
+	if err != nil {
+		return nil, err
+	}
+	return categories, nil
+}
+
+func (r *projectRepository) GetTechnology(ctx context.Context) ([]domain.Technology, error) {
+	var technologies []domain.Technology
+	err := r.db.Select(&technologies, "SELECT id, name FROM Technology")
+	if err != nil {
+		return nil, err
+	}
+	return technologies, nil
+}
+
+func (r *projectRepository) GetLanguage(ctx context.Context) ([]domain.Language, error) {
+	var languages []domain.Language
+	err := r.db.Select(&languages, "SELECT id, name FROM Language")
+	if err != nil {
+		return nil, err
+	}
+	return languages, nil
+}
+
+func (r *projectRepository) GetType(ctx context.Context) ([]domain.Types, error) {
+	var types []domain.Types
+	err := r.db.Select(&types, "SELECT id, name FROM Types")
+	if err != nil {
+		return nil, err
+	}
+	return types, nil
 }

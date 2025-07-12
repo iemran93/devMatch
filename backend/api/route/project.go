@@ -28,6 +28,11 @@ func NewProjectRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, pu
 
 func setupPublicProjectRoutes(controller *controller.ProjectController, router *mux.Router) {
 	router.HandleFunc("/projects", controller.List).Methods("GET")
+	router.HandleFunc("/projects/category", controller.GetCategory).Methods("GET")
+	router.HandleFunc("/projects/technology", controller.GetTechnology).Methods("GET")
+	router.HandleFunc("/projects/language", controller.GetLanguage).Methods("GET")
+	router.HandleFunc("/projects/type", controller.GetType).Methods("GET")
+
 	router.HandleFunc("/projects/{id}", controller.GetById).Methods("GET")
 	// TODO: Implement these handlers in ProjectController
 	//router.HandleFunc("/projects/search", controller.Search).Methods("GET")

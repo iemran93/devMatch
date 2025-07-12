@@ -1,20 +1,17 @@
 import axios from 'axios';
 import { API_CONFIG, APP_ROUTES, AUTH_ROUTES } from './config';
 
-// Create axios instance with default config
 const axiosClient = axios.create({
   baseURL: API_CONFIG.BASE_URL,
   timeout: API_CONFIG.TIMEOUT,
   headers: {
     'Content-Type': API_CONFIG.CONTENT_TYPE,
   },
-  withCredentials: true, // Enable cookies to be sent with requests
+  withCredentials: true, // to send cookies with requests
 });
 
-// Flag to track if a refresh is already in progress
 let isRefreshing = false;
 
-// Simple response interceptor to handle unauthorized errors with refresh attempt
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {

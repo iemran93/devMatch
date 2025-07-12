@@ -1,6 +1,6 @@
-"use client";
-import { ChevronsDown, Menu } from "lucide-react";
-import React, { useEffect, useState } from "react";
+"use client"
+import { ChevronsDown, Menu } from "lucide-react"
+import React, { useEffect, useState } from "react"
 import {
   Sheet,
   SheetContent,
@@ -8,13 +8,13 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "../ui/sheet";
-import { Separator } from "../ui/separator";
-import Link from "next/link";
-import { Button } from "../ui/button";
-import { ToggleTheme } from "./toogle-theme";
-import { useAuth } from "@/context/auth-context";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+} from "../ui/sheet"
+import { Separator } from "../ui/separator"
+import Link from "next/link"
+import { Button } from "../ui/button"
+import { ToggleTheme } from "./toogle-theme"
+import { useAuth } from "@/context/auth-context"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,40 +22,39 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
+} from "../ui/dropdown-menu"
 
 export function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth()
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
 
   // Handle scroll effect for navbar appearance
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
-        setIsScrolled(true);
+        setIsScrolled(true)
       } else {
-        setIsScrolled(false);
+        setIsScrolled(false)
       }
-    };
+    }
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   // Navigation links for both desktop and mobile
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/#projects", label: "Projects" },
-    // { href: "/#features", label: "Features" },
-    // { href: "/#pricing", label: "Pricing" },
-    // { href: "/#contact", label: "Contact" },
-  ];
+    { href: "/projects", label: "Projects" },
+  ]
 
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-200 ${
-        isScrolled ? "bg-background/80 backdrop-blur-md shadow-sm" : "bg-transparent"
+        isScrolled
+          ? "bg-background/80 backdrop-blur-md shadow-sm"
+          : "bg-transparent"
       }`}
     >
       <div className="container flex h-16 items-center justify-between">
@@ -66,9 +65,9 @@ export function Navbar() {
         {/* Desktop navigation */}
         <nav className="hidden md:flex gap-6 text-sm">
           {navLinks.map((link) => (
-            <Link 
-              key={link.href} 
-              href={link.href} 
+            <Link
+              key={link.href}
+              href={link.href}
               className="transition hover:text-primary"
             >
               {link.label}
@@ -84,7 +83,7 @@ export function Navbar() {
         <div className="flex items-center gap-4">
           {/* Theme toggle - visible on all screen sizes */}
           <ToggleTheme />
-          
+
           {/* Mobile menu button - only visible on mobile */}
           <div className="block md:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -97,17 +96,21 @@ export function Navbar() {
               <SheetContent side="left">
                 <SheetHeader>
                   <SheetTitle>
-                    <Link href="/" className="flex items-center" onClick={() => setIsOpen(false)}>
+                    <Link
+                      href="/"
+                      className="flex items-center"
+                      onClick={() => setIsOpen(false)}
+                    >
                       <span className="font-bold text-xl">devMatch</span>
                     </Link>
                   </SheetTitle>
                 </SheetHeader>
                 <div className="flex flex-col gap-4 mt-6">
                   {navLinks.map((link) => (
-                    <Button 
-                      key={link.href} 
-                      asChild 
-                      variant="ghost" 
+                    <Button
+                      key={link.href}
+                      asChild
+                      variant="ghost"
                       className="justify-start"
                       onClick={() => setIsOpen(false)}
                     >
@@ -115,9 +118,9 @@ export function Navbar() {
                     </Button>
                   ))}
                   {isAuthenticated && (
-                    <Button 
-                      asChild 
-                      variant="ghost" 
+                    <Button
+                      asChild
+                      variant="ghost"
                       className="justify-start"
                       onClick={() => setIsOpen(false)}
                     >
@@ -125,28 +128,25 @@ export function Navbar() {
                     </Button>
                   )}
                   {isAuthenticated ? (
-                    <Button 
+                    <Button
                       variant="destructive"
                       onClick={() => {
-                        logout();
-                        setIsOpen(false);
+                        logout()
+                        setIsOpen(false)
                       }}
                     >
                       Logout
                     </Button>
                   ) : (
                     <div className="flex flex-col gap-2 mt-2">
-                      <Button 
-                        asChild 
+                      <Button
+                        asChild
                         variant="outline"
                         onClick={() => setIsOpen(false)}
                       >
                         <Link href="/login">Login</Link>
                       </Button>
-                      <Button 
-                        asChild
-                        onClick={() => setIsOpen(false)}
-                      >
+                      <Button asChild onClick={() => setIsOpen(false)}>
                         <Link href="/register">Sign Up</Link>
                       </Button>
                     </div>
@@ -163,17 +163,27 @@ export function Navbar() {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                <Button
+                  variant="ghost"
+                  className="relative h-8 w-8 rounded-full"
+                >
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={`https://ui-avatars.com/api/?name=${user?.name}`} alt={user?.name || 'User'} />
-                    <AvatarFallback>{user?.name?.substring(0, 2) || 'U'}</AvatarFallback>
+                    <AvatarImage
+                      src={`https://ui-avatars.com/api/?name=${user?.name}`}
+                      alt={user?.name || "User"}
+                    />
+                    <AvatarFallback>
+                      {user?.name?.substring(0, 2) || "U"}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user?.name}</p>
+                    <p className="text-sm font-medium leading-none">
+                      {user?.name}
+                    </p>
                     <p className="text-xs leading-none text-muted-foreground">
                       {user?.email}
                     </p>
@@ -187,7 +197,7 @@ export function Navbar() {
                   <Link href="/profile">Profile</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => logout()}
                   className="cursor-pointer"
                 >
@@ -208,5 +218,5 @@ export function Navbar() {
         </div>
       </div>
     </header>
-  );
+  )
 }

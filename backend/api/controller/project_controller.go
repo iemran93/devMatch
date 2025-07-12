@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -118,6 +119,8 @@ func (pc *ProjectController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println("Updating project with ID:", req)
+
 	ctx := r.Context()
 	if err := pc.ProjectUseCase.Update(ctx, &req, id); err != nil {
 		if err == domain.ErrUnauthorized {
@@ -153,4 +156,48 @@ func (pc *ProjectController) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, "Project deleted successfully")
+}
+
+func (pc *ProjectController) GetCategory(w http.ResponseWriter, r *http.Request) {
+	categories, err := pc.ProjectUseCase.GetCategory(r.Context())
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	utils.JSON(w, http.StatusOK, categories)
+}
+
+func (pc *ProjectController) GetTechnology(w http.ResponseWriter, r *http.Request) {
+	technologies, err := pc.ProjectUseCase.GetTechnology(r.Context())
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	utils.JSON(w, http.StatusOK, technologies)
+}
+
+func (pc *ProjectController) GetLanguage(w http.ResponseWriter, r *http.Request) {
+	languages, err := pc.ProjectUseCase.GetLanguage(r.Context())
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	utils.JSON(w, http.StatusOK, languages)
+}
+
+func (pc *ProjectController) GetType(w http.ResponseWriter, r *http.Request) {
+	types, err := pc.ProjectUseCase.GetType(r.Context())
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	utils.JSON(w, http.StatusOK, types)
 }
