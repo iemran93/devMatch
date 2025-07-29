@@ -26,6 +26,14 @@ func NewSignupUseCase(userRepository repository.UserRepository, timeout time.Dur
 }
 
 func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupRequest, env *bootstrap.Env) (accessToken string, refreshToken string, err error) {
+	// Check if user already exists
+	existingUser, _ := su.userRepository.GetUserByEmail(ctx, request.Email)
+	if existingUser != nil {
+		log.Error("User already exists")
+		err = domain.ErrUserAlreadyExists
+		return
+	}
+
 	encryptedPassword, err := bcrypt.GenerateFromPassword(
 		[]byte(request.Password),
 		bcrypt.DefaultCost,

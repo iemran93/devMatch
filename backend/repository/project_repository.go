@@ -9,11 +9,24 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+type ProjectRepository interface {
+	Create(ctx context.Context, project *domain.CreateProjectRequest, creator_id int) (int, error)
+	GetById(ctx context.Context, id int) (*domain.ProjectResponse, error)
+	List(ctx context.Context, filters map[string]any) ([]domain.ProjectResponse, error)
+	Update(ctx context.Context, req *domain.CreateProjectRequest, id int) error
+	Delete(ctx context.Context, id int) error
+	GetCategory(ctx context.Context) ([]domain.Category, error)
+	GetTechnology(ctx context.Context) ([]domain.Technology, error)
+	GetLanguage(ctx context.Context) ([]domain.Language, error)
+	GetType(ctx context.Context) ([]domain.Types, error)
+	GetProjectRoles(ctx context.Context, projectId int) ([]domain.ProjectRole, error)
+}
+
 type projectRepository struct {
 	db *sqlx.DB
 }
 
-func NewProjectRepository(db *sqlx.DB) domain.ProjectRepository {
+func NewProjectRepository(db *sqlx.DB) ProjectRepository {
 	return &projectRepository{
 		db: db,
 	}
@@ -511,4 +524,13 @@ func (r *projectRepository) GetType(ctx context.Context) ([]domain.Types, error)
 		return nil, err
 	}
 	return types, nil
+}
+
+func (r *projectRepository) GetProjectRoles(ctx context.Context, projectId int) ([]domain.ProjectRole, error) {
+	var roles []domain.ProjectRole
+	err := r.db.Select(&roles, "SELECT * FROM ProjectRole WHERE project_id = ?", projectId)
+	if err != nil {
+		return nil, err
+	}
+	return roles, nil
 }

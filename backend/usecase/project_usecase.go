@@ -2,17 +2,19 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/iemran93/devMatch/domain"
+	"github.com/iemran93/devMatch/repository"
 )
 
 type projectUseCase struct {
-	projectRepository domain.ProjectRepository
+	projectRepository repository.ProjectRepository
 	contextTimeout    time.Duration
 }
 
-func NewProjectUseCase(projectRepository domain.ProjectRepository, timeout time.Duration) domain.ProjectUseCase {
+func NewProjectUseCase(projectRepository repository.ProjectRepository, timeout time.Duration) domain.ProjectUseCase {
 	return &projectUseCase{
 		projectRepository: projectRepository,
 		contextTimeout:    timeout,
@@ -74,8 +76,8 @@ func (pu *projectUseCase) Delete(c context.Context, id int) error {
 	// Get user ID from context and verify ownership
 	userId := ctx.Value("user_id").(int)
 	existingProject, err := pu.projectRepository.GetById(ctx, id)
-	if err != nil {
-		return err
+	if err != nil || existingProject == nil {
+		return domain.ErrProjectNotFound
 	}
 	if existingProject.Creator.Id != userId {
 		return domain.ErrUnauthorized

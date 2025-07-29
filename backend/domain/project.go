@@ -86,18 +86,6 @@ type ProjectResponse struct {
 	ProjectRoles []ProjectRole `json:"project_roles"`
 }
 
-type ProjectRepository interface {
-	Create(ctx context.Context, project *CreateProjectRequest, creator_id int) (int, error)
-	GetById(ctx context.Context, id int) (*ProjectResponse, error)
-	List(ctx context.Context, filters map[string]any) ([]ProjectResponse, error)
-	Update(ctx context.Context, req *CreateProjectRequest, id int) error
-	Delete(ctx context.Context, id int) error
-	GetCategory(ctx context.Context) ([]Category, error)
-	GetTechnology(ctx context.Context) ([]Technology, error)
-	GetLanguage(ctx context.Context) ([]Language, error)
-	GetType(ctx context.Context) ([]Types, error)
-}
-
 type ProjectUseCase interface {
 	Create(ctx context.Context, req *CreateProjectRequest) (*ProjectResponse, error)
 	GetById(ctx context.Context, id int) (*ProjectResponse, error)

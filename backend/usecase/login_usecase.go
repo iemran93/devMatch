@@ -30,6 +30,7 @@ func (lu *loginUseCase) Login(ctx context.Context, request domain.LoginRequest, 
 	user, err = lu.userRepository.GetUserByEmail(ctx, request.Email)
 	if err != nil {
 		log.Error(err)
+		err = domain.ErrUserNotFound
 		return
 	}
 
