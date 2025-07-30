@@ -1,36 +1,16 @@
-"use client"
+'use client'
 
-import { Loading } from "@/components/layout/loading"
+import { Loading } from '@/components/layout/loading'
 import {
   useGetProjectById,
   useDeleteProject,
   useUpdateProject,
-} from "@/lib/requests/project_requests"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Checkbox } from "@/components/ui/checkbox"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+} from '@/lib/requests/project_requests'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   Calendar,
   User,
@@ -41,19 +21,23 @@ import {
   Star,
   Clock,
   Edit,
-  Trash2,
-  Plus,
-} from "lucide-react"
-import { useAuth } from "@/context/auth-context"
-import { useParams, useRouter } from "next/navigation"
+} from 'lucide-react'
+import { useAuth } from '@/context/auth-context'
+import { useParams, useRouter } from 'next/navigation'
 import {
   getStageColor,
   getStageIcon,
   getExperienceLevelText,
-} from "@/components/layout/components_helper"
-import { useState } from "react"
-import { useToast } from "@/components/ui/use-toast"
-import { ProjectRolesRequest } from "@/lib/types/project_types"
+} from '@/components/layout/components_helper'
+import { useState } from 'react'
+import { useToast } from '@/components/ui/use-toast'
+import {
+  CreateProjectRequest,
+  ProjectRolesRequest,
+} from '@/lib/types/project_types'
+import { DeleteDialog } from '@/components/layout/DeleteDialog'
+import { NewRoleDialog } from '@/components/layout/NewRoleDialog'
+import { UpdateRoleDialog } from '@/components/layout/UpdateRoleDialog'
 
 export default function ProjectPage() {
   const params = useParams()
@@ -68,8 +52,8 @@ export default function ProjectPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [editingRole, setEditingRole] = useState<any>(null)
   const [newRole, setNewRole] = useState<ProjectRolesRequest>({
-    title: "",
-    description: "",
+    title: '',
+    description: '',
     required_experience_level: 1,
     is_filled: false,
   })
@@ -90,15 +74,15 @@ export default function ProjectPage() {
     try {
       await deleteProjectMutation.mutateAsync(id)
       toast({
-        title: "Success",
-        description: "Project deleted successfully",
+        title: 'Success',
+        description: 'Project deleted successfully',
       })
-      router.push("/projects")
+      router.push('/projects')
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to delete project",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to delete project',
+        variant: 'destructive',
       })
     }
   }
@@ -117,12 +101,12 @@ export default function ProjectPage() {
       const updatedRoles = [...existingRoles, newRole]
 
       // Send complete project data as required by API
-      const projectData = {
+      const projectData: CreateProjectRequest = {
         title: project!.title,
         description: project!.description,
         goals: project!.goals,
         category_id: project!.category.id,
-        stage: project!.stage as "Idea" | "In Progress" | "Completed",
+        stage: project!.stage as 'Idea' | 'In Progress' | 'Completed',
         project_type: project!.types.map((type) => type.id),
         technologies: project!.technologies?.map((tech) => tech.id) || [],
         languages: project!.languages?.map((lang) => lang.id) || [],
@@ -131,21 +115,21 @@ export default function ProjectPage() {
 
       await updateProjectMutation.mutateAsync(projectData)
       toast({
-        title: "Success",
-        description: "Role added successfully",
+        title: 'Success',
+        description: 'Role added successfully',
       })
       setIsAddRoleDialogOpen(false)
       setNewRole({
-        title: "",
-        description: "",
+        title: '',
+        description: '',
         required_experience_level: 1,
         is_filled: false,
       })
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to add role",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to add role',
+        variant: 'destructive',
       })
     }
   }
@@ -160,7 +144,7 @@ export default function ProjectPage() {
                 title: editingRole.title,
                 description: editingRole.description,
                 required_experience_level: parseInt(
-                  editingRole.required_experience_level
+                  editingRole.required_experience_level,
                 ),
                 is_filled: editingRole.is_filled,
               }
@@ -168,19 +152,19 @@ export default function ProjectPage() {
                 title: role.title,
                 description: role.description,
                 required_experience_level: parseInt(
-                  role.required_experience_level
+                  role.required_experience_level,
                 ),
                 is_filled: role.is_filled,
-              }
+              },
         ) || []
 
       // Send complete project data as required by API
-      const projectData = {
+      const projectData: CreateProjectRequest = {
         title: project!.title,
         description: project!.description,
         goals: project!.goals,
         category_id: project!.category.id,
-        stage: project!.stage as "Idea" | "In Progress" | "Completed",
+        stage: project!.stage as 'Idea' | 'In Progress' | 'Completed',
         project_type: project!.types.map((type) => type.id),
         technologies: project!.technologies?.map((tech) => tech.id) || [],
         languages: project!.languages?.map((lang) => lang.id) || [],
@@ -189,16 +173,16 @@ export default function ProjectPage() {
 
       await updateProjectMutation.mutateAsync(projectData)
       toast({
-        title: "Success",
-        description: "Role updated successfully",
+        title: 'Success',
+        description: 'Role updated successfully',
       })
       setIsEditRoleDialogOpen(false)
       setEditingRole(null)
     } catch (error) {
       toast({
-        title: "Error",
-        description: "Failed to update role",
-        variant: "destructive",
+        title: 'Error',
+        description: 'Failed to update role',
+        variant: 'destructive',
       })
     }
   }
@@ -208,6 +192,7 @@ export default function ProjectPage() {
   }
 
   if (isError || !project) {
+    //TODO: add error pages (redirect)
     return (
       <div className="container mx-auto py-24 text-center">
         <h1 className="text-2xl font-bold text-muted-foreground">
@@ -260,43 +245,11 @@ export default function ProjectPage() {
             {/* Creator Controls */}
             {isCreator && (
               <div className="flex items-center gap-2 ml-4">
-                <Dialog
-                  open={isDeleteDialogOpen}
-                  onOpenChange={setIsDeleteDialogOpen}
-                >
-                  <DialogTrigger asChild>
-                    <Button variant="destructive" size="sm">
-                      <Trash2 className="h-4 w-4 mr-1" />
-                      Delete
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Delete Project</DialogTitle>
-                      <DialogDescription>
-                        Are you sure you want to delete this project? This
-                        action cannot be undone.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                      <Button
-                        variant="outline"
-                        onClick={() => setIsDeleteDialogOpen(false)}
-                      >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => {
-                          handleDeleteProject()
-                          setIsDeleteDialogOpen(false)
-                        }}
-                      >
-                        Delete Project
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                <DeleteDialog
+                  isOpen={isDeleteDialogOpen}
+                  setIsOpen={setIsDeleteDialogOpen}
+                  onDelete={handleDeleteProject}
+                />
               </div>
             )}
           </div>
@@ -313,7 +266,7 @@ export default function ProjectPage() {
           <CardContent>
             <div className="flex items-center gap-3">
               <Avatar>
-                <AvatarImage src={project.creator.profilePicture || ""} />
+                <AvatarImage src={project.creator.profilePicture || ''} />
                 <AvatarFallback>
                   {project.creator.name.charAt(0)}
                 </AvatarFallback>
@@ -371,86 +324,13 @@ export default function ProjectPage() {
                   Available Roles
                 </CardTitle>
                 {isCreator && (
-                  <Dialog
-                    open={isAddRoleDialogOpen}
-                    onOpenChange={setIsAddRoleDialogOpen}
-                  >
-                    <DialogTrigger asChild>
-                      <Button size="sm" variant="outline">
-                        <Plus className="h-4 w-4 mr-1" />
-                        Add Role
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Role</DialogTitle>
-                        <DialogDescription>
-                          Add a new role to your project
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="title">Title</Label>
-                          <Input
-                            id="title"
-                            value={newRole.title}
-                            onChange={(e) =>
-                              setNewRole({ ...newRole, title: e.target.value })
-                            }
-                            placeholder="e.g., Frontend Developer"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="description">Description</Label>
-                          <Textarea
-                            id="description"
-                            value={newRole.description || ""}
-                            onChange={(e) =>
-                              setNewRole({
-                                ...newRole,
-                                description: e.target.value,
-                              })
-                            }
-                            placeholder="Describe the role responsibilities..."
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="experience">Experience Level</Label>
-                          <Select
-                            value={newRole.required_experience_level.toString()}
-                            onValueChange={(value) =>
-                              setNewRole({
-                                ...newRole,
-                                required_experience_level: parseInt(value),
-                              })
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1">1 - Beginner</SelectItem>
-                              <SelectItem value="2">2 - Basic</SelectItem>
-                              <SelectItem value="3">
-                                3 - Intermediate
-                              </SelectItem>
-                              <SelectItem value="4">4 - Advanced</SelectItem>
-                              <SelectItem value="5">5 - Expert</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <DialogFooter>
-                        <Button
-                          variant="outline"
-                          onClick={() => setIsAddRoleDialogOpen(false)}
-                        >
-                          Cancel
-                        </Button>
-                        <Button onClick={handleAddRole}>Add Role</Button>
-                      </DialogFooter>
-                    </DialogContent>
-                  </Dialog>
+                  <NewRoleDialog
+                    isOpen={isAddRoleDialogOpen}
+                    setIsOpen={setIsAddRoleDialogOpen}
+                    role={newRole}
+                    setRole={setNewRole}
+                    onAdd={handleAddRole}
+                  />
                 )}
               </div>
             </CardHeader>
@@ -468,17 +348,17 @@ export default function ProjectPage() {
                           <div className="flex items-center gap-1">
                             <Star className="h-4 w-4" />
                             <span>
-                              Level {role.required_experience_level} -{" "}
+                              Level {role.required_experience_level} -{' '}
                               {getExperienceLevelText(
-                                parseInt(role.required_experience_level)
+                                parseInt(role.required_experience_level),
                               )}
                             </span>
                           </div>
                           <Badge
-                            variant={role.is_filled ? "default" : "secondary"}
+                            variant={role.is_filled ? 'default' : 'secondary'}
                             className="text-xs"
                           >
-                            {role.is_filled ? "Filled" : "Open"}
+                            {role.is_filled ? 'Filled' : 'Open'}
                           </Badge>
                         </div>
                       </div>
@@ -626,99 +506,13 @@ export default function ProjectPage() {
 
       {/* Edit Role Dialog */}
       {editingRole && (
-        <Dialog
-          open={isEditRoleDialogOpen}
-          onOpenChange={setIsEditRoleDialogOpen}
-        >
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Edit Role</DialogTitle>
-              <DialogDescription>Update the role information</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-title">Title</Label>
-                <Input
-                  id="edit-title"
-                  value={editingRole.title || ""}
-                  onChange={(e) =>
-                    setEditingRole({ ...editingRole, title: e.target.value })
-                  }
-                  placeholder="e.g., Frontend Developer"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-description">Description</Label>
-                <Textarea
-                  id="edit-description"
-                  value={editingRole.description || ""}
-                  onChange={(e) =>
-                    setEditingRole({
-                      ...editingRole,
-                      description: e.target.value,
-                    })
-                  }
-                  placeholder="Describe the role responsibilities..."
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-experience">Experience Level</Label>
-                <Select
-                  value={
-                    editingRole.required_experience_level?.toString() || "1"
-                  }
-                  onValueChange={(value) =>
-                    setEditingRole({
-                      ...editingRole,
-                      required_experience_level: parseInt(value),
-                    })
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1 - Beginner</SelectItem>
-                    <SelectItem value="2">2 - Basic</SelectItem>
-                    <SelectItem value="3">3 - Intermediate</SelectItem>
-                    <SelectItem value="4">4 - Advanced</SelectItem>
-                    <SelectItem value="5">5 - Expert</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="edit-is-filled"
-                  checked={editingRole.is_filled || false}
-                  onCheckedChange={(checked) =>
-                    setEditingRole({
-                      ...editingRole,
-                      is_filled: checked === true,
-                    })
-                  }
-                />
-                <Label
-                  htmlFor="edit-is-filled"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Mark this role as filled
-                </Label>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsEditRoleDialogOpen(false)
-                  setEditingRole(null)
-                }}
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleUpdateRole}>Update Role</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <UpdateRoleDialog
+          isOpen={isEditRoleDialogOpen}
+          setIsOpen={setIsEditRoleDialogOpen}
+          role={editingRole}
+          setRole={setEditingRole}
+          onUpdate={handleUpdateRole}
+        />
       )}
     </div>
   )

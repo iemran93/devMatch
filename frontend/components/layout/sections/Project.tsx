@@ -23,7 +23,9 @@ export const Projects = () => {
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects?.slice(0, 3).map((project) => (
-          <ProjectCard key={project.id} project={project} />
+          <Link href={`/projects/${project.id}`} key={project.id}>
+            <ProjectCard project={project} />
+            </Link>
         ))}
         {/* // button to view all projects */}
         <Link
