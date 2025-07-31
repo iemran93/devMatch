@@ -26,6 +26,13 @@ func NewProjectActionsUseCase(projectActionsRepository *repository.ProjectAction
 	}
 }
 
+func (p *projectActionUseCase) GetById(ctx context.Context, id int) ([]*domain.ProjectRequest, error) {
+	ctx, cancel := context.WithTimeout(ctx, p.contextTimeout)
+	defer cancel()
+
+	return p.projectActionsRepository.Get(ctx, id)
+}
+
 func (p *projectActionUseCase) ApplyToProject(ctx context.Context, req domain.ProjectActionRequest) error {
 	ctx, cancel := context.WithTimeout(ctx, p.contextTimeout)
 	defer cancel()

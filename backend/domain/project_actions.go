@@ -29,6 +29,7 @@ type ProjectActionReplyRequest struct {
 }
 
 type ProjectActionsUseCase interface {
+	GetById(ctx context.Context, id int) ([]*ProjectRequest, error)
 	ApplyToProject(ctx context.Context, req ProjectActionRequest) error
 	CancelRequestToProject(ctx context.Context, req ProjectActionRequest) error
 	WithdrawFromProject(ctx context.Context, req ProjectActionRequest) error

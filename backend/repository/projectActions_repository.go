@@ -8,6 +8,7 @@ import (
 )
 
 type ProjectActionsRepo interface {
+	Get(ctx context.Context, id int) ([]*domain.ProjectRequest, error)
 	ApplyToProject(ctx context.Context, req domain.ProjectActionRequest) error
 	CancelRequestToProject(ctx context.Context, req domain.ProjectActionRequest) error
 	WithdrawFromProject(ctx context.Context, req domain.ProjectActionRequest) error
@@ -20,6 +21,17 @@ type ProjectActionsRepository struct {
 
 func NewProjectActionsRepository(db *sqlx.DB) *ProjectActionsRepository {
 	return &ProjectActionsRepository{db: db}
+}
+
+func (r *ProjectActionsRepository) Get(ctx context.Context, id int) ([]*domain.ProjectRequest, error) {
+	var projectRequests []*domain.ProjectRequest
+
+	err := r.db.Select(&projectRequests, "SELECT * FROM ProjectRequest WHERE project_id = ?", id)
+	if err != nil {
+		return nil, err
+	}
+
+	return projectRequests, nil
 }
 
 func (r *ProjectActionsRepository) ApplyToProject(ctx context.Context, req domain.ProjectActionRequest) error {

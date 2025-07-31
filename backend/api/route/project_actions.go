@@ -22,6 +22,7 @@ func NewProjectActionsRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx
 	}
 
 	group := r.PathPrefix("/project/request").Subrouter()
+	group.HandleFunc("/{id}", pc.GetProjectRequests).Methods("GET")
 	group.HandleFunc("/apply", pc.ApplyToProject).Methods("POST")
 	group.HandleFunc("/cancel", pc.CancelRequestToProject).Methods("DELETE")
 	group.HandleFunc("/withdraw", pc.WithdrawFromProject).Methods("DELETE")

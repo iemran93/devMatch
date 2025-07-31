@@ -38,6 +38,9 @@ import {
 import { DeleteDialog } from '@/components/layout/DeleteDialog'
 import { NewRoleDialog } from '@/components/layout/NewRoleDialog'
 import { UpdateRoleDialog } from '@/components/layout/UpdateRoleDialog'
+import { ProjectActionRequest } from '@/lib/types/project_action_types'
+import { ApplyDialog } from '@/components/layout/ApplyDialog'
+import { useApplyRole } from '@/lib/requests/project_action_request'
 
 export default function ProjectPage() {
   const params = useParams()
@@ -50,7 +53,11 @@ export default function ProjectPage() {
   const [isEditRoleDialogOpen, setIsEditRoleDialogOpen] = useState(false)
   const [isAddRoleDialogOpen, setIsAddRoleDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isApplyRoleDialogOpen, setIsApplyRoleDialogOpen] = useState(false)
   const [editingRole, setEditingRole] = useState<any>(null)
+  const [applyRole, setApplyRole] = useState<ProjectActionRequest>(
+    {} as ProjectActionRequest,
+  )
   const [newRole, setNewRole] = useState<ProjectRolesRequest>({
     title: '',
     description: '',
@@ -66,6 +73,7 @@ export default function ProjectPage() {
 
   const deleteProjectMutation = useDeleteProject()
   const updateProjectMutation = useUpdateProject(id)
+  const applyRoleMutation = useApplyRole()
 
   // Check if current user is the project creator
   const isCreator = user?.id === project?.creator.id
@@ -187,6 +195,23 @@ export default function ProjectPage() {
     }
   }
 
+  const handleApplyRole = async () => {
+    try {
+      await applyRoleMutation.mutateAsync(applyRole)
+      toast({
+        title: 'Success',
+        description: 'Role applied successfully',
+      })
+      setIsApplyRoleDialogOpen(false)
+      setApplyRole({} as ProjectActionRequest)
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to apply to role',
+        variant: 'destructive',
+      })
+    }
+  }
   if (projectLoading) {
     return <Loading />
   }
@@ -336,7 +361,7 @@ export default function ProjectPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {project.project_roles.map((role, index) => (
+                {project.project_roles.map((role) => (
                   <div
                     key={role.id}
                     className="border rounded-lg p-4 space-y-3"
@@ -382,7 +407,17 @@ export default function ProjectPage() {
                       </p>
                     )}
                     {!role.is_filled && isAuthenticated && !isCreator && (
-                      <Button size="sm" variant="outline">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setApplyRole({
+                            project_id: role.project_id,
+                            role_id: role.id,
+                          })
+                          setIsApplyRoleDialogOpen(true)
+                        }}
+                      >
                         Apply for Role
                       </Button>
                     )}
@@ -512,6 +547,19 @@ export default function ProjectPage() {
           role={editingRole}
           setRole={setEditingRole}
           onUpdate={handleUpdateRole}
+        />
+      )}
+
+      {/* Accept dialog */}
+      {applyRole && (
+        <ApplyDialog
+          isOpen={isApplyRoleDialogOpen}
+          setIsOpen={setIsApplyRoleDialogOpen}
+          onAccept={handleApplyRole}
+          data={
+            project?.project_roles.find((pr) => pr.id === applyRole.role_id)
+              ?.title
+          }
         />
       )}
     </div>

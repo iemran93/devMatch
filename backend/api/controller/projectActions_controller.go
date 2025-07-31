@@ -3,7 +3,9 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/iemran93/devMatch/bootstrap"
 	"github.com/iemran93/devMatch/domain"
 	"github.com/iemran93/devMatch/utils"
@@ -13,6 +15,31 @@ import (
 type ProjectActionsController struct {
 	ProjectActionsUseCase domain.ProjectActionsUseCase
 	Env                   *bootstrap.Env
+}
+
+func (c *ProjectActionsController) GetProjectRequests(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: "Invalid project ID"})
+		return
+	}
+
+	ctx := r.Context()
+	projectRequests, err := c.ProjectActionsUseCase.GetById(ctx, id)
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusInternalServerError, domain.ErrorResponse{Message: "Internal server error"})
+		return
+	}
+
+	if projectRequests == nil {
+		utils.JSON(w, http.StatusNotFound, domain.ErrorResponse{Message: "Project not found"})
+		return
+	}
+
+	utils.JSON(w, http.StatusOK, projectRequests)
 }
 
 func (c *ProjectActionsController) ApplyToProject(w http.ResponseWriter, r *http.Request) {
