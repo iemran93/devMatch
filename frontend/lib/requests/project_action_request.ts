@@ -1,9 +1,4 @@
-import {
-  useMutation,
-  useQueries,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import axiosClient from '../axiosClient'
 import { MessageResponse } from '../types/error_types'
 import {
@@ -37,7 +32,7 @@ const useApplyRole = () => {
   return useMutation({
     mutationFn: applyRole,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['project'] })
+      queryClient.invalidateQueries({ queryKey: ['project_requests'] })
     },
   })
 }
@@ -50,8 +45,12 @@ const cancelRoleRequest = async (req: ProjectActionRequest) => {
 }
 
 const useCancelRoleRequest = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: cancelRoleRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project_requests'] })
+    },
   })
 }
 
@@ -66,8 +65,12 @@ const withdrawRoleRequest = async (req: ProjectActionRequest) => {
 }
 
 const useWithdrawRoleRequest = () => {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: withdrawRoleRequest,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['project_requests'] })
+    },
   })
 }
 

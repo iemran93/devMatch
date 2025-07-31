@@ -85,6 +85,9 @@ html {
     --popover: 0 0% 100%;
     --popover-foreground: 20 14.3% 4.1%;
 
+    --success: 134 95% 35%;
+    --success-foreground: 60 9.1% 97.8%;
+
     --primary: 24.6 95% 53.1%;
     --primary-foreground: 60 9.1% 97.8%;
 

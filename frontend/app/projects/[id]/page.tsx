@@ -54,15 +54,11 @@ export default function ProjectPage() {
   const { user, isAuthenticated } = useAuth()
   const { toast } = useToast()
 
-  // State for managing edit dialogs
+  // useState
   const [isEditRoleDialogOpen, setIsEditRoleDialogOpen] = useState(false)
   const [isAddRoleDialogOpen, setIsAddRoleDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  // const [isApplyRoleDialogOpen, setIsApplyRoleDialogOpen] = useState(false)
   const [editingRole, setEditingRole] = useState<any>(null)
-  // const [applyRole, setApplyRole] = useState<ProjectActionRequest>(
-  //   {} as ProjectActionRequest,
-  // )
   const [newRole, setNewRole] = useState<ProjectRolesRequest>({
     title: '',
     description: '',
@@ -210,39 +206,9 @@ export default function ProjectPage() {
     }
   }
 
-  // const handleApplyRole = async () => {
-  //   try {
-  //     await applyRoleMutation.mutateAsync(applyRole)
-  //     toast({
-  //       title: 'Success',
-  //       description: 'Role applied successfully',
-  //     })
-  //     setIsApplyRoleDialogOpen(false)
-  //     setApplyRole({} as ProjectActionRequest)
-  //   } catch (error) {
-  //     toast({
-  //       title: 'Error',
-  //       description: 'Failed to apply to role',
-  //       variant: 'destructive',
-  //     })
-  //   }
-  // }
-  // if (projectLoading || projectRequestsLoading) {
-  //   return <Loading />
-  // }
-
   if (projectError || projectRequestsError || !project) {
     //TODO: add error pages (redirect)
-    return (
-      <div className="container mx-auto py-24 text-center">
-        <h1 className="text-2xl font-bold text-muted-foreground">
-          Project not found
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          The project you&apos;re looking for doesn&apos;t exist.
-        </p>
-      </div>
-    )
+    return <Loading />
   }
 
   const StageIcon = getStageIcon(project.stage)
@@ -424,7 +390,6 @@ export default function ProjectPage() {
                     {isAuthenticated &&
                       !isCreator &&
                       (() => {
-                        // Check if role is filled by current user (accepted request)
                         const isFilledByCurrentUser =
                           role.is_filled &&
                           projectRequests?.some(
@@ -434,7 +399,6 @@ export default function ProjectPage() {
                               pr.status === 'accepted',
                           )
 
-                        // Check if user has pending request for this role
                         const hasPendingRequest = projectRequests?.some(
                           (pr) =>
                             pr.role_id === role.id &&
@@ -442,20 +406,29 @@ export default function ProjectPage() {
                             pr.status === 'pending',
                         )
 
-                        // Determine button state and action
+                        const hasRegected = projectRequests?.some(
+                          (pr) =>
+                            pr.role_id === role.id &&
+                            pr.user_id === Number(user?.id) &&
+                            pr.status === 'rejected',
+                        )
+
                         let buttonText,
                           handleClick,
                           isDisabled = false
 
+                        let buttonVariant = 'default' as any
+                        // if filled by other user hide the button
+                        let showButton = true
+
                         if (role.is_filled) {
                           if (isFilledByCurrentUser) {
-                            buttonText = 'Withdraw'
-                            handleClick = () =>
-                              withdrawRoleMutation.mutate({
-                                project_id: role.project_id,
-                                role_id: role.id,
-                              })
+                            buttonText = 'You are in'
+                            handleClick = () => {}
+                            buttonVariant = 'success'
+                            isDisabled = true
                           } else {
+                            showButton = false
                             buttonText = 'Filled'
                             handleClick = () => {}
                             isDisabled = true
@@ -468,6 +441,12 @@ export default function ProjectPage() {
                                 project_id: role.project_id,
                                 role_id: role.id,
                               })
+                            buttonVariant = 'destructive'
+                          } else if (hasRegected) {
+                            buttonText = 'Rejected'
+                            handleClick = () => {}
+                            buttonVariant = 'destructive'
+                            isDisabled = true
                           } else {
                             buttonText = 'Apply for Role'
                             handleClick = () =>
@@ -475,24 +454,21 @@ export default function ProjectPage() {
                                 project_id: role.project_id,
                                 role_id: role.id,
                               })
+                            buttonVariant = 'default'
                           }
                         }
 
-                        // Check if any mutation is loading
-                        const isLoading =
-                          applyRoleMutation.isPending ||
-                          cancelRoleMutation.isPending ||
-                          withdrawRoleMutation.isPending
-
                         return (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            disabled={isDisabled || isLoading}
-                            onClick={handleClick}
-                          >
-                            {isLoading ? 'Loading...' : buttonText}
-                          </Button>
+                          showButton && (
+                            <Button
+                              size="sm"
+                              variant={buttonVariant}
+                              disabled={isDisabled}
+                              onClick={handleClick}
+                            >
+                              {buttonText}
+                            </Button>
+                          )
                         )
                       })()}
                   </div>
