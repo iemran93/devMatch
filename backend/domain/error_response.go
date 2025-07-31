@@ -24,4 +24,5 @@ var (
 	ErrRequestAlreadyExists       = errors.New("request already exists")
 	ErrRequestNotFound            = errors.New("request not found")
 	ErrFaildToChangeRequestStatus = errors.New("failed to change request status")
+	ErrRequestNorAllowed          = errors.New("Request not allowed")
 )

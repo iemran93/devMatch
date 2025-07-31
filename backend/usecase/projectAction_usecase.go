@@ -30,7 +30,7 @@ func (p *projectActionUseCase) GetById(ctx context.Context, id int) ([]*domain.P
 	ctx, cancel := context.WithTimeout(ctx, p.contextTimeout)
 	defer cancel()
 
-	return p.projectActionsRepository.Get(ctx, id)
+	return p.projectActionsRepository.List(ctx, id)
 }
 
 func (p *projectActionUseCase) ApplyToProject(ctx context.Context, req domain.ProjectActionRequest) error {
@@ -76,7 +76,7 @@ func (p *projectActionUseCase) CancelRequestToProject(ctx context.Context, req d
 		return err
 	}
 	for _, request := range requests {
-		if request.ProjectId == req.ProjectId && request.Status == "pending" {
+		if request.ProjectId == req.ProjectId && request.RoleId == req.RoleId && request.Status == "pending" {
 			// logic to cancel the request
 			return p.projectActionsRepository.CancelRequestToProject(ctx, req)
 		}
@@ -98,7 +98,7 @@ func (p *projectActionUseCase) WithdrawFromProject(ctx context.Context, req doma
 		return err
 	}
 	for _, request := range requests {
-		if request.ProjectId == req.ProjectId && (request.Status == "accepted" || request.Status == "pending") {
+		if request.ProjectId == req.ProjectId && request.RoleId == req.RoleId && (request.Status == "accepted") {
 			// logic to withdraw from the project
 			return p.projectActionsRepository.WithdrawFromProject(ctx, req)
 		}
@@ -126,6 +126,13 @@ func (p *projectActionUseCase) ReplyToRequest(ctx context.Context, req domain.Pr
 	}
 	if project.Creator.Id != userID {
 		return domain.ErrUserNotAllowed
+	}
+
+	// check if project role is not filled
+	for _, pr := range project.ProjectRoles {
+		if pr.Id == request.RoleId && pr.IsFilled {
+			return domain.ErrRequestNorAllowed
+		}
 	}
 
 	// logic to reply to the request

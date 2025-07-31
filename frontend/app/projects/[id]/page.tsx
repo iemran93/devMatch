@@ -40,7 +40,12 @@ import { NewRoleDialog } from '@/components/layout/NewRoleDialog'
 import { UpdateRoleDialog } from '@/components/layout/UpdateRoleDialog'
 import { ProjectActionRequest } from '@/lib/types/project_action_types'
 import { ApplyDialog } from '@/components/layout/ApplyDialog'
-import { useApplyRole } from '@/lib/requests/project_action_request'
+import {
+  useApplyRole,
+  useCancelRoleRequest,
+  useGetProjectRequests,
+  useWithdrawRoleRequest,
+} from '@/lib/requests/project_action_request'
 
 export default function ProjectPage() {
   const params = useParams()
@@ -53,11 +58,11 @@ export default function ProjectPage() {
   const [isEditRoleDialogOpen, setIsEditRoleDialogOpen] = useState(false)
   const [isAddRoleDialogOpen, setIsAddRoleDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
-  const [isApplyRoleDialogOpen, setIsApplyRoleDialogOpen] = useState(false)
+  // const [isApplyRoleDialogOpen, setIsApplyRoleDialogOpen] = useState(false)
   const [editingRole, setEditingRole] = useState<any>(null)
-  const [applyRole, setApplyRole] = useState<ProjectActionRequest>(
-    {} as ProjectActionRequest,
-  )
+  // const [applyRole, setApplyRole] = useState<ProjectActionRequest>(
+  //   {} as ProjectActionRequest,
+  // )
   const [newRole, setNewRole] = useState<ProjectRolesRequest>({
     title: '',
     description: '',
@@ -65,15 +70,25 @@ export default function ProjectPage() {
     is_filled: false,
   })
 
+  // query
   const {
     data: project,
     isLoading: projectLoading,
-    isError,
+    isError: projectError,
   } = useGetProjectById(id)
 
+  const {
+    data: projectRequests,
+    isLoading: projectRequestsLoading,
+    isError: projectRequestsError,
+  } = useGetProjectRequests(id)
+
+  // mutation
   const deleteProjectMutation = useDeleteProject()
   const updateProjectMutation = useUpdateProject(id)
   const applyRoleMutation = useApplyRole()
+  const cancelRoleMutation = useCancelRoleRequest()
+  const withdrawRoleMutation = useWithdrawRoleRequest()
 
   // Check if current user is the project creator
   const isCreator = user?.id === project?.creator.id
@@ -195,28 +210,28 @@ export default function ProjectPage() {
     }
   }
 
-  const handleApplyRole = async () => {
-    try {
-      await applyRoleMutation.mutateAsync(applyRole)
-      toast({
-        title: 'Success',
-        description: 'Role applied successfully',
-      })
-      setIsApplyRoleDialogOpen(false)
-      setApplyRole({} as ProjectActionRequest)
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to apply to role',
-        variant: 'destructive',
-      })
-    }
-  }
-  if (projectLoading) {
-    return <Loading />
-  }
+  // const handleApplyRole = async () => {
+  //   try {
+  //     await applyRoleMutation.mutateAsync(applyRole)
+  //     toast({
+  //       title: 'Success',
+  //       description: 'Role applied successfully',
+  //     })
+  //     setIsApplyRoleDialogOpen(false)
+  //     setApplyRole({} as ProjectActionRequest)
+  //   } catch (error) {
+  //     toast({
+  //       title: 'Error',
+  //       description: 'Failed to apply to role',
+  //       variant: 'destructive',
+  //     })
+  //   }
+  // }
+  // if (projectLoading || projectRequestsLoading) {
+  //   return <Loading />
+  // }
 
-  if (isError || !project) {
+  if (projectError || projectRequestsError || !project) {
     //TODO: add error pages (redirect)
     return (
       <div className="container mx-auto py-24 text-center">
@@ -406,21 +421,80 @@ export default function ProjectPage() {
                         {role.description}
                       </p>
                     )}
-                    {!role.is_filled && isAuthenticated && !isCreator && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => {
-                          setApplyRole({
-                            project_id: role.project_id,
-                            role_id: role.id,
-                          })
-                          setIsApplyRoleDialogOpen(true)
-                        }}
-                      >
-                        Apply for Role
-                      </Button>
-                    )}
+                    {isAuthenticated &&
+                      !isCreator &&
+                      (() => {
+                        // Check if role is filled by current user (accepted request)
+                        const isFilledByCurrentUser =
+                          role.is_filled &&
+                          projectRequests?.some(
+                            (pr) =>
+                              pr.role_id === role.id &&
+                              pr.user_id === Number(user?.id) &&
+                              pr.status === 'accepted',
+                          )
+
+                        // Check if user has pending request for this role
+                        const hasPendingRequest = projectRequests?.some(
+                          (pr) =>
+                            pr.role_id === role.id &&
+                            pr.user_id === Number(user?.id) &&
+                            pr.status === 'pending',
+                        )
+
+                        // Determine button state and action
+                        let buttonText,
+                          handleClick,
+                          isDisabled = false
+
+                        if (role.is_filled) {
+                          if (isFilledByCurrentUser) {
+                            buttonText = 'Withdraw'
+                            handleClick = () =>
+                              withdrawRoleMutation.mutate({
+                                project_id: role.project_id,
+                                role_id: role.id,
+                              })
+                          } else {
+                            buttonText = 'Filled'
+                            handleClick = () => {}
+                            isDisabled = true
+                          }
+                        } else {
+                          if (hasPendingRequest) {
+                            buttonText = 'Cancel Application'
+                            handleClick = () =>
+                              cancelRoleMutation.mutate({
+                                project_id: role.project_id,
+                                role_id: role.id,
+                              })
+                          } else {
+                            buttonText = 'Apply for Role'
+                            handleClick = () =>
+                              applyRoleMutation.mutate({
+                                project_id: role.project_id,
+                                role_id: role.id,
+                              })
+                          }
+                        }
+
+                        // Check if any mutation is loading
+                        const isLoading =
+                          applyRoleMutation.isPending ||
+                          cancelRoleMutation.isPending ||
+                          withdrawRoleMutation.isPending
+
+                        return (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={isDisabled || isLoading}
+                            onClick={handleClick}
+                          >
+                            {isLoading ? 'Loading...' : buttonText}
+                          </Button>
+                        )
+                      })()}
                   </div>
                 ))}
               </div>
@@ -550,18 +624,19 @@ export default function ProjectPage() {
         />
       )}
 
-      {/* Accept dialog */}
-      {applyRole && (
-        <ApplyDialog
-          isOpen={isApplyRoleDialogOpen}
-          setIsOpen={setIsApplyRoleDialogOpen}
-          onAccept={handleApplyRole}
-          data={
-            project?.project_roles.find((pr) => pr.id === applyRole.role_id)
-              ?.title
-          }
-        />
-      )}
+      {/* Accept dialog
+        {applyRole && (
+          <ApplyDialog
+            isOpen={isApplyRoleDialogOpen}
+            setIsOpen={setIsApplyRoleDialogOpen}
+            onAccept={handleApplyRole}
+            data={
+              project?.project_roles.find((pr) => pr.id === applyRole.role_id)
+                ?.title
+            }
+          />
+        )}
+      */}
     </div>
   )
 }

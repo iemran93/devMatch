@@ -1,12 +1,31 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  useMutation,
+  useQueries,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query'
 import axiosClient from '../axiosClient'
 import { MessageResponse } from '../types/error_types'
 import {
   ProjectActionReplyRequest,
   ProjectActionRequest,
+  ProjectRequest,
 } from '../types/project_action_types'
 
 const BASE_URL = '/project/request'
+
+const getProjectRequests = async (id: string): Promise<ProjectRequest[]> => {
+  const resp = await axiosClient.get<ProjectRequest[]>(`${BASE_URL}/${id}`)
+  return resp.data
+}
+
+const useGetProjectRequests = (id: string) => {
+  return useQuery({
+    queryKey: ['project_requests', id],
+    queryFn: () => getProjectRequests(id),
+    enabled: !!id,
+  })
+}
 
 const applyRole = async (req: ProjectActionRequest) => {
   const resp = await axiosClient.post<MessageResponse>(`${BASE_URL}/apply`, req)
@@ -72,4 +91,5 @@ export {
   useCancelRoleRequest,
   useWithdrawRoleRequest,
   useReplyRoleRequest,
+  useGetProjectRequests,
 }
