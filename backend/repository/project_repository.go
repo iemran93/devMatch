@@ -366,7 +366,6 @@ func (r *projectRepository) Update(ctx context.Context, req *domain.UpdateProjec
 		UpdatedAt:   time.Now(),
 	}
 
-	// Insert project
 	_, err = tx.NamedExec(`
 		UPDATE Project SET
 			title = :title,

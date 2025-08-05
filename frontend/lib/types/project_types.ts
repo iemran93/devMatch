@@ -60,10 +60,10 @@ export interface UpdateProjectRequest {
   description: string
   goals?: string | null
   stage: string
-  category: Category
-  types: Types[]
-  technologies: Technology[]
-  languages: Language[]
+  category_id: number
+  project_type: number[]
+  technologies: number[]
+  languages: number[]
 }
 
 export interface CreateProjectRequest {

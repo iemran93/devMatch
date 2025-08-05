@@ -62,9 +62,9 @@ type UpdateProjectRequest struct {
 	Goals        *string `json:"goals"`
 	CategoryId   int     `json:"category_id" validate:"required"`
 	Stage        string  `json:"stage" validate:"required,oneof=Idea 'In Progress' Completed"`
-	ProjectType  []int   `json:"project_type" validate:"required"`
-	Technologies []int   `json:"technologies"`
-	Languages    []int   `json:"languages"`
+	ProjectType  []int   `json:"project_type" validate:"required,min=1"`
+	Technologies []int   `json:"technologies" validate:"required,min=1"`
+	Languages    []int   `json:"languages" validate:"required,min=1"`
 }
 
 type CreateProjectRequest struct {
@@ -73,9 +73,9 @@ type CreateProjectRequest struct {
 	Goals        *string              `json:"goals"`
 	CategoryId   int                  `json:"category_id" validate:"required"`
 	Stage        string               `json:"stage" validate:"required,oneof=Idea 'In Progress' Completed"`
-	ProjectType  []int                `json:"project_type" validate:"required"`
-	Technologies []int                `json:"technologies"`
-	Languages    []int                `json:"languages"`
+	ProjectType  []int                `json:"project_type" validate:"required,min=1"`
+	Technologies []int                `json:"technologies" validate:"required,min=1"`
+	Languages    []int                `json:"languages" validate:"required,min=1"`
 	ProjectRoles []ProjectRoleRequest `json:"project_roles" validate:"required,dive"`
 }
 

@@ -120,23 +120,24 @@ export const useCreateProject = () => {
   })
 }
 
-const updateProject = async (id: string, projectData: UpdateProjectRequest) => {
+const updateProject = async (
+  projectId: string,
+  projectData: UpdateProjectRequest,
+) => {
   const response = await axiosClient.put<ProjectResponse>(
-    `/projects/${id}`,
+    `/projects/${projectId}`,
     projectData,
   )
   return response.data
 }
 
-export const useUpdateProject = (id: string) => {
+export const useUpdateProject = (projectId: string) => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (projectData: UpdateProjectRequest) =>
-      updateProject(id, projectData),
+      updateProject(projectId, projectData),
     onSuccess: () => {
-      // Invalidate and refetch the specific project and projects list
-      queryClient.invalidateQueries({ queryKey: ['project', id] })
-      queryClient.invalidateQueries({ queryKey: ['projects'] })
+      queryClient.invalidateQueries({ queryKey: ['project', projectId] })
     },
   })
 }

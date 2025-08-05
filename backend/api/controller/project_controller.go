@@ -114,9 +114,11 @@ func (pc *ProjectController) Update(w http.ResponseWriter, r *http.Request) {
 
 	err = req.Validate()
 	if err != nil {
+		log.Error(err)
 		utils.JSON(w, http.StatusBadRequest, domain.ErrIncorrectRequestBody)
-
+		return
 	}
+	log.Warn(req)
 	ctx := r.Context()
 	if err := pc.ProjectUseCase.Update(ctx, &req, id); err != nil {
 		if err == domain.ErrUnauthorized {

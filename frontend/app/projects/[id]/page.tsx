@@ -21,6 +21,7 @@ import {
   Star,
   Clock,
   Edit,
+  SquarePen,
 } from 'lucide-react'
 import { useAuth } from '@/context/auth-context'
 import { useParams, useRouter } from 'next/navigation'
@@ -32,8 +33,8 @@ import {
 import { useState } from 'react'
 import { useToast } from '@/components/ui/use-toast'
 import {
-  CreateProjectRequest,
   ProjectRolesRequest,
+  UpdateProjectRequest,
 } from '@/lib/types/project_types'
 import { DeleteDialog } from '@/components/layout/DeleteDialog'
 import { NewRoleDialog } from '@/components/layout/NewRoleDialog'
@@ -42,12 +43,12 @@ import {
   useApplyRole,
   useCancelRoleRequest,
   useGetProjectRequests,
-  useWithdrawRoleRequest,
 } from '@/lib/requests/project_action_request'
 import {
   useNewProjectRole,
   useUpdateProjectRole,
 } from '@/lib/requests/project_roles_requests'
+import { UpdateProjectDialog } from '@/components/layout/UpdatePorjectDialog'
 
 export default function ProjectPage() {
   const params = useParams()
@@ -60,7 +61,12 @@ export default function ProjectPage() {
   const [isEditRoleDialogOpen, setIsEditRoleDialogOpen] = useState(false)
   const [isAddRoleDialogOpen, setIsAddRoleDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [isUpdateProjectDialogOpen, setIsUpdateProjectDialogOpen] =
+    useState(false)
   const [editingRole, setEditingRole] = useState<any>(null)
+  const [editingProject, setEditingProject] = useState<UpdateProjectRequest>(
+    {} as UpdateProjectRequest,
+  )
   const [newRole, setNewRole] = useState<ProjectRolesRequest>({
     title: '',
     project_id: 0,
@@ -84,7 +90,7 @@ export default function ProjectPage() {
 
   // mutation
   const deleteProjectMutation = useDeleteProject()
-  // const updateProjectMutation = useUpdateProject(id)
+  const updateProjectMutation = useUpdateProject(id)
   const newProjectRole = useNewProjectRole(id)
   const updateProjectRole = useUpdateProjectRole(id)
   const applyRoleMutation = useApplyRole()
@@ -134,6 +140,22 @@ export default function ProjectPage() {
     }
   }
 
+  const handleUpdateProject = async () => {
+    try {
+      await updateProjectMutation.mutateAsync(editingProject)
+      toast({
+        title: 'Success',
+        description: 'Project updated successfully',
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to update role',
+        variant: 'destructive',
+      })
+    }
+  }
+
   const handleUpdateRole = async () => {
     try {
       const projectRoleRequest: ProjectRolesRequest = {
@@ -173,7 +195,7 @@ export default function ProjectPage() {
   const StageIcon = getStageIcon(project.stage)
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
+    <div className="container mx-auto py-8 space-y-8 p-2">
       {/* Header Section */}
       <div className="space-y-6">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -210,6 +232,27 @@ export default function ProjectPage() {
             {/* Creator Controls */}
             {isCreator && (
               <div className="flex items-center gap-2 ml-4">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setEditingProject({
+                      id: project.id,
+                      title: project.title,
+                      description: project.description,
+                      goals: project.goals || '',
+                      stage: project.stage,
+                      category_id: project.category.id,
+                      project_type: project.types.map((t) => t.id),
+                      technologies: project.technologies.map((t) => t.id),
+                      languages: project.languages.map((l) => l.id),
+                    })
+                    setIsUpdateProjectDialogOpen(true)
+                  }}
+                >
+                  <SquarePen className="h-4 w-4 mr-1" />
+                  Update
+                </Button>
                 <DeleteDialog
                   isOpen={isDeleteDialogOpen}
                   setIsOpen={setIsDeleteDialogOpen}
@@ -559,19 +602,16 @@ export default function ProjectPage() {
         />
       )}
 
-      {/* Accept dialog
-        {applyRole && (
-          <ApplyDialog
-            isOpen={isApplyRoleDialogOpen}
-            setIsOpen={setIsApplyRoleDialogOpen}
-            onAccept={handleApplyRole}
-            data={
-              project?.project_roles.find((pr) => pr.id === applyRole.role_id)
-                ?.title
-            }
-          />
-        )}
-      */}
+      {/* Edit Project Dialog */}
+      {
+        <UpdateProjectDialog
+          isOpen={isUpdateProjectDialogOpen}
+          setIsOpen={setIsUpdateProjectDialogOpen}
+          project={editingProject}
+          setProject={setEditingProject}
+          onUpdate={handleUpdateProject}
+        />
+      }
     </div>
   )
 }

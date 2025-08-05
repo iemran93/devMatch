@@ -18,7 +18,8 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction, useState } from 'react'
+
 type UpdateRoleDialogProps = {
   isOpen: boolean
   setIsOpen: Dispatch<SetStateAction<boolean>>
@@ -26,6 +27,7 @@ type UpdateRoleDialogProps = {
   setRole: Dispatch<SetStateAction<any>>
   onUpdate: () => Promise<void>
 }
+
 export function UpdateRoleDialog({
   isOpen,
   setIsOpen,
@@ -33,6 +35,59 @@ export function UpdateRoleDialog({
   setRole,
   onUpdate,
 }: UpdateRoleDialogProps) {
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!role?.title?.trim()) {
+      newErrors.title = 'Title is required'
+    } else if (role.title.trim().length < 3) {
+      newErrors.title = 'Title must be at least 3 characters'
+    }
+
+    if (
+      !role?.required_experience_level ||
+      role.required_experience_level < 1 ||
+      role.required_experience_level > 5
+    ) {
+      newErrors.required_experience_level = 'Experience level is required'
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
+  const handleUpdate = async () => {
+    if (!validateForm()) {
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      await onUpdate()
+      setIsOpen(false)
+      setErrors({})
+    } catch (error) {
+      console.error('Update role failed:', error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setIsOpen(false)
+    setRole(null)
+    setErrors({})
+  }
+
+  const clearError = (field: string) => {
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: '' }))
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent>
@@ -45,38 +100,54 @@ export function UpdateRoleDialog({
             <Label htmlFor="edit-title">Title</Label>
             <Input
               id="edit-title"
-              value={role.title || ''}
-              onChange={(e) => setRole({ ...role, title: e.target.value })}
+              value={role?.title || ''}
+              onChange={(e) => {
+                setRole({ ...role, title: e.target.value })
+                clearError('title')
+              }}
               placeholder="e.g., Frontend Developer"
+              className={errors.title ? 'border-red-500' : ''}
             />
+            {errors.title && (
+              <p className="text-sm text-red-500">{errors.title}</p>
+            )}
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="edit-description">Description</Label>
             <Textarea
               id="edit-description"
-              value={role.description || ''}
-              onChange={(e) =>
+              value={role?.description || ''}
+              onChange={(e) => {
                 setRole({
                   ...role,
                   description: e.target.value,
                 })
-              }
+                clearError('description')
+              }}
               placeholder="Describe the role responsibilities..."
+              className={errors.description ? 'border-red-500' : ''}
             />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="edit-experience">Experience Level</Label>
             <Select
-              value={role.required_experience_level?.toString() || '1'}
-              onValueChange={(value) =>
+              value={role?.required_experience_level?.toString() || ''}
+              onValueChange={(value) => {
                 setRole({
                   ...role,
                   required_experience_level: parseInt(value),
                 })
-              }
+                clearError('required_experience_level')
+              }}
             >
-              <SelectTrigger>
-                <SelectValue />
+              <SelectTrigger
+                className={
+                  errors.required_experience_level ? 'border-red-500' : ''
+                }
+              >
+                <SelectValue placeholder="Select experience level" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="1">1 - Beginner</SelectItem>
@@ -86,11 +157,17 @@ export function UpdateRoleDialog({
                 <SelectItem value="5">5 - Expert</SelectItem>
               </SelectContent>
             </Select>
+            {errors.required_experience_level && (
+              <p className="text-sm text-red-500">
+                {errors.required_experience_level}
+              </p>
+            )}
           </div>
+
           <div className="flex items-center space-x-2">
             <Checkbox
               id="edit-is-filled"
-              checked={role.is_filled || false}
+              checked={role?.is_filled || false}
               onCheckedChange={(checked) =>
                 setRole({
                   ...role,
@@ -107,16 +184,12 @@ export function UpdateRoleDialog({
           </div>
         </div>
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => {
-              setIsOpen(false)
-              setRole(null)
-            }}
-          >
+          <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={onUpdate}>Update Role</Button>
+          <Button onClick={handleUpdate} disabled={isSubmitting}>
+            {isSubmitting ? 'Updating...' : 'Update Role'}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
