@@ -32,4 +32,6 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mux.Router
 	NewProjectRouter(env, timeout, db, public, protectedRouter)
 
 	NewProjectActionsRouter(env, timeout, db, protectedRouter)
+
+	NewProjectRolesRouter(env, timeout, db, protectedRouter)
 }

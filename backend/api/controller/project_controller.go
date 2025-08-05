@@ -2,7 +2,6 @@ package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -106,29 +105,26 @@ func (pc *ProjectController) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req domain.CreateProjectRequest
+	var req domain.UpdateProjectRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		log.Error(err)
-		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
+		utils.JSON(w, http.StatusBadRequest, domain.ErrIncorrectRequestBody)
 		return
 	}
 
 	err = req.Validate()
 	if err != nil {
-		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: domain.ErrIncorrectRequestBody.Error()})
-		return
+		utils.JSON(w, http.StatusBadRequest, domain.ErrIncorrectRequestBody)
+
 	}
-
-	fmt.Println("Updating project with ID:", req)
-
 	ctx := r.Context()
 	if err := pc.ProjectUseCase.Update(ctx, &req, id); err != nil {
 		if err == domain.ErrUnauthorized {
-			utils.JSON(w, http.StatusForbidden, domain.ErrorResponse{Message: "Not authorized to update this project"})
+			utils.JSON(w, http.StatusForbidden, domain.ErrUnauthorized)
 			return
 		}
 		log.Error(err)
-		utils.JSON(w, http.StatusInternalServerError, domain.ErrorResponse{Message: err.Error()})
+		utils.JSON(w, http.StatusInternalServerError, domain.ErrInternalServerError)
 		return
 	}
 
@@ -200,4 +196,26 @@ func (pc *ProjectController) GetType(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, types)
+}
+
+func (pc *ProjectController) GetProjectRoles(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusBadRequest, domain.ErrIncorrectRequestBody)
+		return
+	}
+
+	roles, err := pc.ProjectUseCase.GetByProjectId(ctx, id)
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusInternalServerError, domain.ErrInternalServerError)
+		return
+	}
+
+	utils.JSON(w, http.StatusOK, roles)
+
 }

@@ -7,6 +7,7 @@ import type {
   ProjectResponse,
   Technology,
   Types,
+  UpdateProjectRequest,
 } from '../types/project_types'
 
 const getProjects = async (): Promise<ProjectResponse[]> => {
@@ -119,7 +120,7 @@ export const useCreateProject = () => {
   })
 }
 
-const updateProject = async (id: string, projectData: CreateProjectRequest) => {
+const updateProject = async (id: string, projectData: UpdateProjectRequest) => {
   const response = await axiosClient.put<ProjectResponse>(
     `/projects/${id}`,
     projectData,
@@ -130,7 +131,7 @@ const updateProject = async (id: string, projectData: CreateProjectRequest) => {
 export const useUpdateProject = (id: string) => {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (projectData: CreateProjectRequest) =>
+    mutationFn: (projectData: UpdateProjectRequest) =>
       updateProject(id, projectData),
     onSuccess: () => {
       // Invalidate and refetch the specific project and projects list

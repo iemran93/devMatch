@@ -36,7 +36,6 @@ func JwtAuthMiddleware(secret string) func(next http.Handler) http.Handler {
 					return
 				}
 				utils.JSON(w, 401, domain.ErrorResponse{Message: domain.ErrUnauthorized.Error()})
-				return
 			})
 	}
 }

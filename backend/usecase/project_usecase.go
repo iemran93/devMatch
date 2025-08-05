@@ -51,7 +51,7 @@ func (pu *projectUseCase) List(c context.Context, filters map[string]any) ([]dom
 	return pu.projectRepository.List(ctx, filters)
 }
 
-func (pu *projectUseCase) Update(c context.Context, req *domain.CreateProjectRequest, id int) error {
+func (pu *projectUseCase) Update(c context.Context, req *domain.UpdateProjectRequest, id int) error {
 	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
 	defer cancel()
 
@@ -107,4 +107,19 @@ func (pu *projectUseCase) GetType(c context.Context) ([]domain.Types, error) {
 	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
 	defer cancel()
 	return pu.projectRepository.GetType(ctx)
+}
+
+func (pu *projectUseCase) GetByProjectId(c context.Context, id int) ([]*domain.ProjectRole, error) {
+	ctx, cancel := context.WithTimeout(c, pu.contextTimeout)
+	defer cancel()
+
+	// project exist ?
+	project, err := pu.projectRepository.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if project == nil {
+		return nil, domain.ErrProjectNotFound
+	}
+	return pu.projectRepository.GetByProjectId(ctx, id)
 }

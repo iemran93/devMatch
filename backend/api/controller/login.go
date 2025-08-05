@@ -45,5 +45,4 @@ func (lc *LoginController) Login(w http.ResponseWriter, r *http.Request) {
 	response := resp
 
 	utils.JSON(w, http.StatusOK, response)
-	return
 }

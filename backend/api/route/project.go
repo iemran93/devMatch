@@ -34,6 +34,7 @@ func setupPublicProjectRoutes(controller *controller.ProjectController, router *
 	router.HandleFunc("/projects/type", controller.GetType).Methods("GET")
 
 	router.HandleFunc("/projects/{id}", controller.GetById).Methods("GET")
+	router.HandleFunc("/projects/{id}/roles", controller.GetProjectRoles).Methods("GET")
 	// TODO: Implement these handlers in ProjectController
 	//router.HandleFunc("/projects/search", controller.Search).Methods("GET")
 	//router.HandleFunc("/projects/categories", controller.GetCategories).Methods("GET")
@@ -43,6 +44,7 @@ func setupProtectedProjectRoutes(controller *controller.ProjectController, route
 	router.HandleFunc("/projects", controller.Create).Methods("POST")
 	router.HandleFunc("/projects/{id}", controller.Update).Methods("PUT")
 	router.HandleFunc("/projects/{id}", controller.Delete).Methods("DELETE")
+	// Role route
 	// TODO: Implement these handlers in ProjectController
 	//router.HandleFunc("/projects/my", controller.GetMyProjects).Methods("GET")
 	//router.HandleFunc("/projects/{id}/join", controller.JoinProject).Methods("POST")

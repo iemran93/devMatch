@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import {
   createContext,
@@ -6,21 +6,21 @@ import {
   useEffect,
   useState,
   ReactNode,
-} from "react"
-import { useQueryClient, useMutation } from "@tanstack/react-query"
-import { useRouter } from "next/navigation"
+} from 'react'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
 import {
   loginUser,
   signupUser,
   getCurrentUser,
   logoutUser,
-} from "@/lib/requests/auth_requests"
+} from '@/lib/requests/auth_requests'
 import {
   User,
   LoginCredentials,
   SignupCredentials,
-} from "../lib/types/auth_types"
-import { APP_ROUTES } from "@/lib/config"
+} from '../lib/types/auth_types'
+import { APP_ROUTES } from '@/lib/config'
 
 interface AuthContextType {
   user: User | null
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Function to initialize auth state
   const initializeAuth = async () => {
-    if (typeof window === "undefined") return // Skip on server-side
+    if (typeof window === 'undefined') return // Skip on server-side
 
     setIsLoading(true)
 
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData)
     } catch (err) {
       // If unsuccessful, user is not authenticated
-      console.error("Failed to get user:", err)
+      console.error('Failed to get user:', err)
       setUser(null)
     } finally {
       setIsLoading(false)
@@ -71,7 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (data) => {
       setUser(data.user)
       setError(null)
-      router.push(APP_ROUTES.HOME) // Redirect to home/dashboard after login
+      // router.push(APP_ROUTES.HOME)
+      window.location.href = APP_ROUTES.HOME
     },
     onError: (error: Error) => {
       setError(error.message)
@@ -100,7 +101,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       router.push(APP_ROUTES.LOGIN)
     },
     onError: (error: Error) => {
-      console.error("Logout failed:", error)
+      console.error('Logout failed:', error)
       // Still remove user state on error
       setUser(null)
       router.push(APP_ROUTES.LOGIN)
@@ -139,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider")
+    throw new Error('useAuth must be used within an AuthProvider')
   }
   return context
 }

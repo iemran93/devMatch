@@ -53,7 +53,6 @@ func (uc *UserController) GetUserById(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, user)
-	return
 }
 
 func (uc *UserController) UpdateUser(w http.ResponseWriter, r *http.Request) {

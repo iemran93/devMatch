@@ -25,4 +25,5 @@ var (
 	ErrRequestNotFound            = errors.New("request not found")
 	ErrFaildToChangeRequestStatus = errors.New("failed to change request status")
 	ErrRequestNorAllowed          = errors.New("Request not allowed")
+	ErrInternalServerError        = errors.New("Internal server error")
 )

@@ -12,8 +12,9 @@ import (
 type ProjectRepository interface {
 	Create(ctx context.Context, project *domain.CreateProjectRequest, creator_id int) (int, error)
 	GetById(ctx context.Context, id int) (*domain.ProjectResponse, error)
+	GetByProjectId(ctx context.Context, id int) ([]*domain.ProjectRole, error)
 	List(ctx context.Context, filters map[string]any) ([]domain.ProjectResponse, error)
-	Update(ctx context.Context, req *domain.CreateProjectRequest, id int) error
+	Update(ctx context.Context, req *domain.UpdateProjectRequest, id int) error
 	Delete(ctx context.Context, id int) error
 	GetCategory(ctx context.Context) ([]domain.Category, error)
 	GetTechnology(ctx context.Context) ([]domain.Technology, error)
@@ -348,7 +349,7 @@ func (r *projectRepository) List(ctx context.Context, filters map[string]interfa
 	return projects, nil
 }
 
-func (r *projectRepository) Update(ctx context.Context, req *domain.CreateProjectRequest, id int) error {
+func (r *projectRepository) Update(ctx context.Context, req *domain.UpdateProjectRequest, id int) error {
 	tx, err := r.db.Beginx()
 	if err != nil {
 		return err
@@ -435,20 +436,7 @@ func (r *projectRepository) Update(ctx context.Context, req *domain.CreateProjec
 	}
 
 	// update roles
-	_, err = tx.Exec("DELETE FROM ProjectRole WHERE project_id = ?", id)
-	if err != nil {
-		return err
-	}
-	for _, role := range req.ProjectRoles {
-		_, err = tx.Exec(`
-			INSERT INTO ProjectRole (
-				project_id, title, description, required_experience_level, is_filled
-			) VALUES (?, ?, ?, ?, ?)
-		`, id, role.Title, role.Description, role.RequiredExperienceLeve, role.IsFilled)
-		if err != nil {
-			return err
-		}
-	}
+	// different url
 
 	return tx.Commit()
 }
@@ -533,4 +521,40 @@ func (r *projectRepository) GetProjectRoles(ctx context.Context, projectId int) 
 		return nil, err
 	}
 	return roles, nil
+}
+func (r *projectRepository) GetByProjectId(ctx context.Context, id int) ([]*domain.ProjectRole, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	defer tx.Rollback()
+
+	query := `SELECT * FROM ProjectRole WHERE project_id=?`
+	rows, err := tx.QueryContext(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var projectRoles []*domain.ProjectRole
+	for rows.Next() {
+		var pr domain.ProjectRole
+		err := rows.Scan(
+			&pr.Id, &pr.ProjectId, &pr.Title, &pr.Description,
+			&pr.RequiredExperienceLeve, &pr.IsFilled)
+		if err != nil {
+			return nil, err
+		}
+		projectRoles = append(projectRoles, &pr)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return projectRoles, nil
 }

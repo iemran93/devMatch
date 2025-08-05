@@ -1,13 +1,12 @@
-"use client";
+'use client'
 
-import { useState } from "react";
-import Link from "next/link";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import * as z from "zod";
+import Link from 'next/link'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Card,
   CardContent,
@@ -15,7 +14,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card'
 import {
   Form,
   FormControl,
@@ -23,39 +22,39 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { useAuth } from "@/context/auth-context";
-import { toast } from "sonner";
-import { GoogleLoginButton } from "@/components/auth/GoogleLoginButton";
+} from '@/components/ui/form'
+import { useAuth } from '@/context/auth-context'
+import { toast } from 'sonner'
+import { GoogleLoginButton } from '@/components/auth/GoogleLoginButton'
 
 const loginSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
+  email: z.string().email({ message: 'Please enter a valid email address' }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
+    .min(6, { message: 'Password must be at least 6 characters' }),
+})
 
-type LoginFormValues = z.infer<typeof loginSchema>;
+type LoginFormValues = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
-  const { login, isLoading, error } = useAuth();
+  const { login, isLoading, error } = useAuth()
 
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-  });
+  })
 
   async function onSubmit(data: LoginFormValues) {
     try {
-      await login(data);
+      await login(data)
     } catch (error) {
       if (error instanceof Error) {
-        toast.error(error.message);
+        toast.error(error.message)
       } else {
-        toast.error("Failed to login. Please try again.");
+        toast.error('Failed to login. Please try again.')
       }
     }
   }
@@ -139,7 +138,7 @@ export default function LoginPage() {
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Signing in..." : "Sign in with Email"}
+                  {isLoading ? 'Signing in...' : 'Sign in with Email'}
                 </Button>
               </form>
             </Form>
@@ -158,5 +157,5 @@ export default function LoginPage() {
         </Card>
       </div>
     </div>
-  );
+  )
 }

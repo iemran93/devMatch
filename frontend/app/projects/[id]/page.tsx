@@ -38,14 +38,16 @@ import {
 import { DeleteDialog } from '@/components/layout/DeleteDialog'
 import { NewRoleDialog } from '@/components/layout/NewRoleDialog'
 import { UpdateRoleDialog } from '@/components/layout/UpdateRoleDialog'
-import { ProjectActionRequest } from '@/lib/types/project_action_types'
-import { ApplyDialog } from '@/components/layout/ApplyDialog'
 import {
   useApplyRole,
   useCancelRoleRequest,
   useGetProjectRequests,
   useWithdrawRoleRequest,
 } from '@/lib/requests/project_action_request'
+import {
+  useNewProjectRole,
+  useUpdateProjectRole,
+} from '@/lib/requests/project_roles_requests'
 
 export default function ProjectPage() {
   const params = useParams()
@@ -61,6 +63,7 @@ export default function ProjectPage() {
   const [editingRole, setEditingRole] = useState<any>(null)
   const [newRole, setNewRole] = useState<ProjectRolesRequest>({
     title: '',
+    project_id: 0,
     description: '',
     required_experience_level: 1,
     is_filled: false,
@@ -81,10 +84,11 @@ export default function ProjectPage() {
 
   // mutation
   const deleteProjectMutation = useDeleteProject()
-  const updateProjectMutation = useUpdateProject(id)
+  // const updateProjectMutation = useUpdateProject(id)
+  const newProjectRole = useNewProjectRole(id)
+  const updateProjectRole = useUpdateProjectRole(id)
   const applyRoleMutation = useApplyRole()
   const cancelRoleMutation = useCancelRoleRequest()
-  const withdrawRoleMutation = useWithdrawRoleRequest()
 
   // Check if current user is the project creator
   const isCreator = user?.id === project?.creator.id
@@ -107,32 +111,9 @@ export default function ProjectPage() {
   }
 
   const handleAddRole = async () => {
+    newRole.project_id = parseInt(id)
     try {
-      // Convert existing roles to request format
-      const existingRoles: ProjectRolesRequest[] =
-        project?.project_roles.map((role) => ({
-          title: role.title,
-          description: role.description,
-          required_experience_level: parseInt(role.required_experience_level),
-          is_filled: role.is_filled,
-        })) || []
-
-      const updatedRoles = [...existingRoles, newRole]
-
-      // Send complete project data as required by API
-      const projectData: CreateProjectRequest = {
-        title: project!.title,
-        description: project!.description,
-        goals: project!.goals,
-        category_id: project!.category.id,
-        stage: project!.stage as 'Idea' | 'In Progress' | 'Completed',
-        project_type: project!.types.map((type) => type.id),
-        technologies: project!.technologies?.map((tech) => tech.id) || [],
-        languages: project!.languages?.map((lang) => lang.id) || [],
-        project_roles: updatedRoles,
-      }
-
-      await updateProjectMutation.mutateAsync(projectData)
+      await newProjectRole.mutateAsync(newRole)
       toast({
         title: 'Success',
         description: 'Role added successfully',
@@ -155,42 +136,20 @@ export default function ProjectPage() {
 
   const handleUpdateRole = async () => {
     try {
-      // Convert all roles to request format
-      const updatedRoles: ProjectRolesRequest[] =
-        project?.project_roles.map((role) =>
-          role.id === editingRole.id
-            ? {
-                title: editingRole.title,
-                description: editingRole.description,
-                required_experience_level: parseInt(
-                  editingRole.required_experience_level,
-                ),
-                is_filled: editingRole.is_filled,
-              }
-            : {
-                title: role.title,
-                description: role.description,
-                required_experience_level: parseInt(
-                  role.required_experience_level,
-                ),
-                is_filled: role.is_filled,
-              },
-        ) || []
-
-      // Send complete project data as required by API
-      const projectData: CreateProjectRequest = {
-        title: project!.title,
-        description: project!.description,
-        goals: project!.goals,
-        category_id: project!.category.id,
-        stage: project!.stage as 'Idea' | 'In Progress' | 'Completed',
-        project_type: project!.types.map((type) => type.id),
-        technologies: project!.technologies?.map((tech) => tech.id) || [],
-        languages: project!.languages?.map((lang) => lang.id) || [],
-        project_roles: updatedRoles,
+      const projectRoleRequest: ProjectRolesRequest = {
+        title: editingRole.title,
+        project_id: parseInt(id),
+        description: editingRole.description,
+        required_experience_level: parseInt(
+          editingRole.required_experience_level,
+        ),
+        is_filled: editingRole.is_filled,
       }
 
-      await updateProjectMutation.mutateAsync(projectData)
+      await updateProjectRole.mutateAsync({
+        roleId: editingRole.id,
+        data: projectRoleRequest,
+      })
       toast({
         title: 'Success',
         description: 'Role updated successfully',

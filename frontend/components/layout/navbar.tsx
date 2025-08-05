@@ -1,6 +1,6 @@
-"use client"
-import { ChevronsDown, Menu } from "lucide-react"
-import React, { useEffect, useState } from "react"
+'use client'
+import { Menu } from 'lucide-react'
+import React, { useEffect, useState } from 'react'
 import {
   Sheet,
   SheetContent,
@@ -8,13 +8,13 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "../ui/sheet"
-import { Separator } from "../ui/separator"
-import Link from "next/link"
-import { Button } from "../ui/button"
-import { ToggleTheme } from "./toogle-theme"
-import { useAuth } from "@/context/auth-context"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+} from '../ui/sheet'
+import { Separator } from '../ui/separator'
+import Link from 'next/link'
+import { Button } from '../ui/button'
+import { ToggleTheme } from './toogle-theme'
+import { useAuth } from '@/context/auth-context'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,7 +22,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu"
+} from '../ui/dropdown-menu'
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAuth()
@@ -39,22 +39,22 @@ export function Navbar() {
       }
     }
 
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
   // Navigation links for both desktop and mobile
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/projects", label: "Projects" },
+    { href: '/', label: 'Home' },
+    { href: '/projects', label: 'Projects' },
   ]
 
   return (
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-200 ${
         isScrolled
-          ? "bg-background/80 backdrop-blur-md shadow-sm"
-          : "bg-transparent"
+          ? 'bg-background/80 backdrop-blur-md shadow-sm'
+          : 'bg-transparent'
       }`}
     >
       <div className="container flex h-16 items-center justify-between">
@@ -170,10 +170,10 @@ export function Navbar() {
                   <Avatar className="h-8 w-8">
                     <AvatarImage
                       src={`https://ui-avatars.com/api/?name=${user?.name}`}
-                      alt={user?.name || "User"}
+                      alt={user?.name || 'User'}
                     />
                     <AvatarFallback>
-                      {user?.name?.substring(0, 2) || "U"}
+                      {user?.name?.substring(0, 2) || 'U'}
                     </AvatarFallback>
                   </Avatar>
                 </Button>
