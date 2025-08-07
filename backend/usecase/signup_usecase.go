@@ -30,7 +30,14 @@ func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupReques
 	existingUser, _ := su.userRepository.GetUserByEmail(ctx, request.Email)
 	if existingUser != nil {
 		log.Error("User already exists")
-		err = domain.ErrUserAlreadyExists
+		err = domain.ErrEmailAlreadyExists
+		return
+	}
+
+	existingUser, _ = su.userRepository.GetUserByUsername(ctx, request.Username)
+	if existingUser != nil {
+		log.Error("User already exists")
+		err = domain.ErrUsernameAlreadyExists
 		return
 	}
 
@@ -47,6 +54,7 @@ func (su *signupUseCase) SignUp(ctx context.Context, request domain.SignupReques
 
 	user := &domain.User{
 		Name:      request.Name,
+		Username:  request.Username,
 		Email:     request.Email,
 		Password:  request.Password,
 		CreatedAt: time.Now(),

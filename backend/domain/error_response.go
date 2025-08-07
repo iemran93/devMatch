@@ -9,6 +9,8 @@ type ErrorResponse struct {
 // Error List:
 var (
 	ErrUserAlreadyExists          = errors.New("user already exists")
+	ErrEmailAlreadyExists         = errors.New("email already exists")
+	ErrUsernameAlreadyExists      = errors.New("username already exists")
 	ErrUserNotAllowed             = errors.New("user not allowed")
 	ErrUserNotFound               = errors.New("user not found")
 	ErrUnauthorized               = errors.New("unauthorized")

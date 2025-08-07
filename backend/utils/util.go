@@ -1,8 +1,10 @@
 package utils
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"errors"
+	"math/big"
 	"net/http"
 
 	"github.com/iemran93/devMatch/bootstrap"
@@ -63,4 +65,18 @@ func GetCookie(r *http.Request, name string) (string, error) {
 		}
 	}
 	return cookie.Value, nil
+}
+
+const charset = "abcdefghijklmnopqrstuvwxyz0123456789"
+
+func GenerateID(length int) (string, error) {
+	result := make([]byte, length)
+	for i := range result {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		result[i] = charset[num.Int64()]
+	}
+	return string(result), nil
 }

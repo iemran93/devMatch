@@ -11,6 +11,7 @@ type SignupRequest struct {
 	Name     string `json:"name" validate:"required"`
 	Email    string `json:"email" validate:"required,email"`
 	Password string `json:"password" validate:"required,min=8"`
+	Username string `json:"username" validate:"required,min=4"`
 }
 
 type SignupResponse struct {
@@ -30,4 +31,3 @@ func (sr *SignupRequest) Validate() error {
 type SignupUseCase interface {
 	SignUp(ctx context.Context, request SignupRequest, env *bootstrap.Env) (accessToken string, refreshToken string, err error)
 }
-

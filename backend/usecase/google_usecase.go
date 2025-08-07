@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -14,6 +15,7 @@ import (
 	"github.com/iemran93/devMatch/domain"
 	"github.com/iemran93/devMatch/internal/tokenutil"
 	"github.com/iemran93/devMatch/repository"
+	"github.com/iemran93/devMatch/utils"
 
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
@@ -39,11 +41,17 @@ func (lu *googleUseCase) GoogleLogin(ctx context.Context, data []byte, env *boot
 		return
 	}
 
+	rid, err := utils.GenerateID(4)
+	if err != nil {
+		log.Error(err)
+		return
+	}
 	user := &domain.User{
 		GoogleId:       sql.NullString{String: googleUser.Id},
 		ProfilePicture: sql.NullString{String: googleUser.Picture},
 		Email:          googleUser.Email,
 		Name:           googleUser.Name,
+		Username:       fmt.Sprintf("%s_%s", googleUser.Name, rid),
 	}
 
 	var existingUser *domain.User

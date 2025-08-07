@@ -1,26 +1,26 @@
-"use client";
+'use client'
 
-import { Button } from "@/components/ui/button";
-import { initiateGoogleLogin } from "@/lib/requests/auth_requests";
-import { FaGoogle } from "react-icons/fa";
-import { useState } from "react";
+import { Button } from '@/components/ui/button'
+import { initiateGoogleLogin } from '@/lib/requests/auth_requests'
+import { FaGoogle } from 'react-icons/fa'
+import { useState } from 'react'
 
 interface GoogleLoginButtonProps {
-  className?: string;
+  className?: string
 }
 
-export function GoogleLoginButton({ className = "" }: GoogleLoginButtonProps) {
-  const [isLoading, setIsLoading] = useState(false);
+export function GoogleLoginButton({ className = '' }: GoogleLoginButtonProps) {
+  const [isLoading, setIsLoading] = useState(false)
 
   const handleGoogleLogin = () => {
     try {
-      setIsLoading(true);
-      initiateGoogleLogin();
+      setIsLoading(true)
+      initiateGoogleLogin()
     } catch (error) {
-      setIsLoading(false);
-      console.error("Google login failed:", error);
+      setIsLoading(false)
+      console.error('Google login failed:', error)
     }
-  };
+  }
 
   return (
     <Button
@@ -37,5 +37,5 @@ export function GoogleLoginButton({ className = "" }: GoogleLoginButtonProps) {
       )}
       Continue with Google
     </Button>
-  );
-} 
+  )
+}

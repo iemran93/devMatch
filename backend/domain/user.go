@@ -11,6 +11,7 @@ type User struct {
 	GoogleId       sql.NullString `json:"google_id" db:"google_id"`
 	ProfilePicture sql.NullString `json:"profile_picture" db:"profile_picture"`
 	Name           string         `json:"name" db:"name"`
+	Username       string         `json:"username" db:"username"`
 	Password       string         `json:"password" db:"password"`
 	Email          string         `json:"email" db:"email"`
 	Availability   bool           `json:"availability" db:"availability"`
@@ -23,6 +24,7 @@ type UserResponse struct {
 	GoogleId       string    `json:"google_id" db:"google_id"`
 	ProfilePicture string    `json:"profile_picture" db:"profile_picture"`
 	Name           string    `json:"name" db:"name"`
+	Username       string    `json:"username" db:"username"`
 	Email          string    `json:"email" db:"email"`
 	Availability   bool      `json:"availability" db:"availability"`
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`

@@ -13,6 +13,7 @@ type UserRepository interface {
 	GetUsers(ctx context.Context) ([]*domain.User, error)
 	GetUserById(ctx context.Context, id int) (*domain.User, error)
 	GetUserByEmail(ctx context.Context, email string) (*domain.User, error)
+	GetUserByUsername(ctx context.Context, username string) (*domain.User, error)
 	CreateUser(ctx context.Context, user *domain.User) (*domain.User, error)
 	UpdateUser(ctx context.Context, user *domain.User) error
 	DeleteUser(ctx context.Context, userId int) error
@@ -48,6 +49,16 @@ func (r *userRepository) GetUserById(ctx context.Context, id int) (*domain.User,
 	return &user, nil
 }
 
+func (r *userRepository) GetUserByUsername(ctx context.Context, username string) (*domain.User, error) {
+	user := domain.User{}
+	err := r.db.Get(&user, `SELECT * FROM User WHERE username = ?`, username)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
 func (r *userRepository) GetUserByEmail(ctx context.Context, email string) (*domain.User, error) {
 	user := domain.User{}
 	err := r.db.Get(&user, `SELECT * FROM User WHERE email = ?`, email)
@@ -66,7 +77,7 @@ func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*do
 	defer tx.Commit()
 
 	if user.GoogleId.Valid {
-		res, err := tx.NamedExec(`INSERT INTO User (email, google_id, name, profile_picture) VALUES (:email, :google_id, :name, :profile_picture)`, user)
+		res, err := tx.NamedExec(`INSERT INTO User (email, google_id, name, username, profile_picture) VALUES (:email, :google_id, :name, :username, :profile_picture)`, user)
 		if err != nil {
 			tx.Rollback()
 			return nil, err
@@ -81,7 +92,7 @@ func (r *userRepository) CreateUser(ctx context.Context, user *domain.User) (*do
 		return user, nil
 	}
 
-	res, err := tx.NamedExec(`INSERT INTO User (email, password, name) VALUES (:email, :password, :name) `, user)
+	res, err := tx.NamedExec(`INSERT INTO User (email, password, name, username) VALUES (:email, :password, :name, :username) `, user)
 	if err != nil {
 		tx.Rollback()
 		return nil, err
@@ -121,6 +132,9 @@ func (r *userRepository) UpdateUser(ctx context.Context, user *domain.User) erro
 	}
 	if user.Name != "" {
 		fieldsQuery += "name = :name,"
+	}
+	if user.Username != "" {
+		fieldsQuery += "username = :username,"
 	}
 	if user.Password != "" {
 		fieldsQuery += "password = :password,"
