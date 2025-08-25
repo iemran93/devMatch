@@ -34,6 +34,7 @@ func (uu *userUseCase) GetUsers(c context.Context) ([]*domain.UserResponse, erro
 			GoogleId:       user.GoogleId.String,
 			ProfilePicture: user.ProfilePicture.String,
 			Name:           user.Name,
+			Username:       user.Username,
 			Email:          user.Email,
 			Availability:   user.Availability,
 			CreatedAt:      user.CreatedAt,
@@ -55,6 +56,7 @@ func (uu *userUseCase) GetUserById(c context.Context, id int) (*domain.UserRespo
 		GoogleId:       user.GoogleId.String,
 		ProfilePicture: user.ProfilePicture.String,
 		Name:           user.Name,
+		Username:       user.Username,
 		Email:          user.Email,
 		Availability:   user.Availability,
 		CreatedAt:      user.CreatedAt,
@@ -72,4 +74,46 @@ func (uu *userUseCase) DeleteUser(c context.Context, id int) error {
 	ctx, cancel := context.WithTimeout(c, uu.contextTimeout)
 	defer cancel()
 	return uu.userRepository.DeleteUser(ctx, id)
+}
+
+func (uu *userUseCase) GetUserByUsername(c context.Context, username string) (*domain.UserResponse, error) {
+	ctx, cancel := context.WithTimeout(c, uu.contextTimeout)
+	defer cancel()
+
+	userId := ctx.Value("user_id").(int)
+
+	cuser, err := uu.userRepository.GetUserById(ctx, userId)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := uu.userRepository.GetUserByUsername(ctx, username)
+	if err != nil {
+		return nil, err
+	}
+
+	var ur *domain.UserResponse
+	if cuser.Id == userId {
+		ur = &domain.UserResponse{
+			Id:             user.Id,
+			GoogleId:       user.GoogleId.String,
+			ProfilePicture: user.ProfilePicture.String,
+			Name:           user.Name,
+			Email:          user.Email,
+			Availability:   user.Availability,
+			CreatedAt:      user.CreatedAt,
+		}
+		return ur, nil
+	}
+
+	ur = &domain.UserResponse{
+		Id:             user.Id,
+		ProfilePicture: user.ProfilePicture.String,
+		Name:           user.Name,
+		Username:       user.Username,
+		Availability:   user.Availability,
+		CreatedAt:      user.CreatedAt,
+	}
+	return ur, nil
+
 }

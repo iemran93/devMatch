@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/iemran93/devMatch/bootstrap"
 	"github.com/iemran93/devMatch/domain"
 	"github.com/iemran93/devMatch/utils"
@@ -106,4 +107,25 @@ func (uc *UserController) DeleteUser(w http.ResponseWriter, r *http.Request) {
 
 	utils.JSON(w, http.StatusOK, "Success")
 	return
+}
+
+func (uc *UserController) GetUserByUsername(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	vars := mux.Vars(r)
+	username, exist := vars["username"]
+	if !exist {
+		log.Error(domain.ErrIncorrectRequestBody)
+		utils.JSON(w, http.StatusBadRequest, domain.ErrIncorrectRequestBody)
+		return
+	}
+
+	user, err := uc.UserUseCase.GetUserByUsername(ctx, username)
+	if err != nil {
+		log.Error(err)
+		utils.JSON(w, http.StatusBadRequest, domain.ErrorResponse{Message: err.Error()})
+		return
+	}
+
+	utils.JSON(w, http.StatusOK, user)
 }

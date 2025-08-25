@@ -22,6 +22,7 @@ func NewUserRouter(env *bootstrap.Env, timeout time.Duration, db *sqlx.DB, r *mu
 	group := r.PathPrefix("/user").Subrouter()
 	group.HandleFunc("/all", uc.GetUsers).Methods("GET")
 	group.HandleFunc("", uc.GetUserById).Methods("GET")
+	group.HandleFunc("/{username}", uc.GetUserByUsername).Methods("GET")
 	group.HandleFunc("", uc.UpdateUser).Methods("PUT")
 	group.HandleFunc("", uc.DeleteUser).Methods("DELETE")
 }

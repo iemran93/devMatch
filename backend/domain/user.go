@@ -32,6 +32,7 @@ type UserResponse struct {
 
 type UserUseCase interface {
 	GetUserById(c context.Context, id int) (*UserResponse, error)
+	GetUserByUsername(c context.Context, username string) (*UserResponse, error)
 	GetUsers(c context.Context) ([]*UserResponse, error)
 	UpdateUser(c context.Context, user *User) error
 	DeleteUser(c context.Context, id int) error

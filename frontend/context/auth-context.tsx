@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     onSuccess: (data) => {
       setUser(data.user)
       setError(null)
-      router.push(APP_ROUTES.HOME) // Redirect to home/dashboard after signup
+      router.push(APP_ROUTES.HOME)
     },
     onError: (error: Error) => {
       setError(error.message)

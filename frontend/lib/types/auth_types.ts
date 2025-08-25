@@ -14,9 +14,10 @@ export interface User {
   id: string
   name: string
   username: string
-  email: string
+  email?: string
   profilePicture?: string
   googleId?: string
+  availability: boolean
 }
 
 export interface AuthResponse {

@@ -45,5 +45,4 @@ func (sc *SignupController) Signup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	utils.JSON(w, http.StatusOK, signupResponse)
-	return
 }
